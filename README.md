@@ -22,4 +22,5 @@ These Aggregators are meant for a multi-class setup where the scores a distribti
 the label is an int representing the label.
 
 1. Error Rate
+2. Log Loss
 

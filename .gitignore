@@ -1,0 +1,14 @@
+.idea
+.bigquery
+.repl
+target
+editorial
+top
+data
+normed
+tracks
+.DS_Store
+*.pyc
+*.spl
+*.spi
+local_data

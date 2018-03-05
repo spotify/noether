@@ -1,28 +1,42 @@
+/*
+ * Copyright 2018 Spotify AB.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package com.spotify.ml.aggregators
 
 import com.twitter.algebird.Semigroup
 import com.twitter.algebird.Aggregator
 
-case class Prediction(label: Int, score: Double) extends Serializable {
+final case class Prediction(label: Int, score: Double) extends Serializable {
   override def toString: String = s"$label,$score"
 }
 
-case class ConfusionMatrix(tp: Int = 0, fp: Int = 0, fn: Int = 0, tn: Int = 0)
+final case class ConfusionMatrix(tp: Long = 0L, fp: Long = 0L, fn: Long = 0L, tn: Long = 0L)
   extends Serializable
 
-case class Scores(fscore: Double, precision: Double, recall: Double, fpr: Double)
-  extends Serializable
-
-case class ConfusionMatrixAggregator(threshold: Double = 0.5, beta: Double = 1.0)
-  extends Aggregator[Prediction, ConfusionMatrix, Scores]
+final case class ConfusionMatrixAggregator(threshold: Double = 0.5) 
+  extends Aggregator[Prediction, ConfusionMatrix, ConfusionMatrix]
     with Serializable {
 
-  def prepare(input: Prediction): ConfusionMatrix =
+    def prepare(input: Prediction): ConfusionMatrix =
     (input.label, input.score) match {
-      case (1, score) if score > threshold => ConfusionMatrix(tp = 1)
-      case (1, score) if score < threshold => ConfusionMatrix(fn = 1)
-      case (0, score) if score < threshold => ConfusionMatrix(tn = 1)
-      case (0, score) if score > threshold => ConfusionMatrix(fp = 1)
+      case (1, score) if score > threshold => ConfusionMatrix(tp = 1L)
+      case (1, score) if score < threshold => ConfusionMatrix(fn = 1L)
+      case (0, score) if score < threshold => ConfusionMatrix(tn = 1L)
+      case (0, score) if score > threshold => ConfusionMatrix(fp = 1L)
     }
 
   def semigroup: Semigroup[ConfusionMatrix] =
@@ -31,27 +45,8 @@ case class ConfusionMatrixAggregator(threshold: Double = 0.5, beta: Double = 1.0
       val fp = l.fp + r.fp
       val fn = l.fn + r.fn
       val tn = l.tn + r.tn
-
       ConfusionMatrix(tp, fp, fn, tn)
     }
 
-  def present(m: ConfusionMatrix): Scores = {
-    val precDenom = m.tp.toDouble + m.fp.toDouble
-    val precision = if(precDenom > 0.0) m.tp.toDouble/precDenom else 1.0
-
-    val recallDenom = m.tp.toDouble + m.fn.toDouble
-    val recall = if(recallDenom > 0.0) m.tp.toDouble/recallDenom else 1.0
-
-    val fpDenom = m.fp.toDouble + m.tn.toDouble
-    val fpr = if(fpDenom > 0.0) m.fp.toDouble/fpDenom else 0.0
-
-    val betaSqr = Math.pow(beta, 2.0)
-
-    val fScoreDenom = (betaSqr*precision) + recall
-    val fscore = if(fScoreDenom > 0.0){
-      (1 + betaSqr) * ((precision*recall) / fScoreDenom)
-    } else { 1.0 }
-
-    Scores(fscore, precision, recall, fpr)
-  }
+  def present(m: ConfusionMatrix): ConfusionMatrix = m
 }

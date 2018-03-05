@@ -1,3 +1,20 @@
+/*
+ * Copyright 2018 Spotify AB.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package com.spotify.ml.aggregators
 
 import com.twitter.algebird.{Aggregator, Semigroup}
@@ -30,18 +47,18 @@ case class AUCAggregator(metric: AUCMetric, samples: Int = 100)
   with Serializable {
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
-  private lazy val aggregators = thresholds.data.map(ConfusionMatrixAggregator(_)).toList
+  private lazy val aggregators = thresholds.data.map(ClassificationAggregator(_)).toList
 
   def prepare(input: Prediction): Curve = Curve(aggregators.map(_.prepare(input)))
 
   def semigroup: Semigroup[Curve] = {
-    val sg = ConfusionMatrixAggregator().semigroup
+    val sg = ClassificationAggregator().semigroup
     Semigroup.from{case(l, r) => Curve(l.cm.zip(r.cm).map{case(cl, cr) => sg.plus(cl, cr)})}
   }
 
   def present(c: Curve): Double = {
     val total = c.cm.map { matrix =>
-      val scores = ConfusionMatrixAggregator().present(matrix)
+      val scores = ClassificationAggregator().present(matrix)
       metric match {
         case ROC => (scores.fpr, scores.recall)
         case PR => (scores.recall, scores.precision)

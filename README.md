@@ -1,10 +1,16 @@
-# Machine Learning Aggregators
+# ML Aggregators
 
-Collection of Algebird based Aggregators for Machine Learning tasks.
+This library contains a set of monoids and aggregators for ML oriented tasks in Scala.  The library builds upon
+the aggregators and monoids found in the Algebird Library.
+
+# Aggregators
+
+Currently the library has metric driven aggregators which is broken down below. 
 
 ## Metrics
 
-Currently available metric aggregators:
+These metrics are split between different types of predictions.  The simple case is binary
+but some multi-class predictions are provided also.
 
 ### Binary
 
@@ -23,4 +29,10 @@ the label is an int representing the label.
 
 1. Error Rate
 2. Log Loss
+
+# License
+
+Copyright 2016-2018 Spotify AB.
+
+Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 

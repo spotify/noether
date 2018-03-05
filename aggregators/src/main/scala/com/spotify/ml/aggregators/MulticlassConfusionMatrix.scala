@@ -14,25 +14,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package com.spotify.ml.aggregators
 
-import org.scalactic.TolerantNumerics
-import org.scalatest.{FlatSpec, Matchers}
+import com.twitter.algebird._
 
-class AUCAggregatorTest extends FlatSpec with Matchers {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
+final case class PredictionResult(predicted: Int, actual: Int) extends Serializable
 
-  private val data =
-    List(
-      (0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0)
-    ).map{case(s, pred) => Prediction(pred.toInt, s)}
+final case class MulticlassConfusionMatrixAggregator(labels: Seq[Int])
+  extends Aggregator[PredictionResult, Map[(Int, Int), Long], Map[(Int, Int), Long]]
+  with Serializable {
 
-  it should "return roc auc" in {
-    assert(AUCAggregator(ROC, samples=50)(data) === 0.7)
+  def prepare(input: PredictionResult): Map[(Int, Int), Long] = {
+    Map((input.predicted, input.actual) -> 1L)
   }
 
-  it should "return pr auc" in {
-    assert(AUCAggregator(PR, samples=50)(data) === 0.83)
+  def semigroup: Semigroup[Map[(Int, Int), Long]] = Semigroup.mapSemigroup[(Int, Int), Long]
+
+  def present(m: Map[(Int, Int), Long]): Map[(Int, Int), Long] = {
+    labels.flatMap(i => labels.map(j => ((i, j), m.getOrElse((i,j), 0L)))).toMap
   }
 }

@@ -20,12 +20,11 @@ package com.spotify.ml.aggregators
 import com.twitter.algebird.Semigroup
 import com.twitter.algebird.Aggregator
 
-final case class Prediction(label: Int, score: Double) extends Serializable {
+final case class Prediction(label: Int, score: Double) {
   override def toString: String = s"$label,$score"
 }
 
 final case class ConfusionMatrix(tp: Long = 0L, fp: Long = 0L, fn: Long = 0L, tn: Long = 0L)
-  extends Serializable
 
 final case class ConfusionMatrixAggregator(threshold: Double = 0.5) 
   extends Aggregator[Prediction, ConfusionMatrix, ConfusionMatrix]

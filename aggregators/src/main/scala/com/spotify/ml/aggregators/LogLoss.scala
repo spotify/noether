@@ -20,7 +20,7 @@ package com.spotify.ml.aggregators
 import com.twitter.algebird.Semigroup
 import com.twitter.algebird.Aggregator
 
-final case class LogLossPrediction(scores: List[Double], label: Int) extends Serializable {
+final case class LogLossPrediction(scores: List[Double], label: Int) {
   override def toString: String = s"$label,${scores.mkString(":")}"
 }
 

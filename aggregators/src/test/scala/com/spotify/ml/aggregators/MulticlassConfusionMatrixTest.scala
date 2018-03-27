@@ -46,9 +46,6 @@ class MulticlassConfusionMatrixTest extends FlatSpec with Matchers {
       (2,1) -> 1L,
       (2,2) -> 3L
     )
-
     assert(actual == expected)
-
   }
-
 }

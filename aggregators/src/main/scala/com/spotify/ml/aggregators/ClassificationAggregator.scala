@@ -17,10 +17,16 @@
 
 package com.spotify.ml.aggregators
 
+import breeze.numerics.sqrt
 import com.twitter.algebird.Semigroup
 import com.twitter.algebird.Aggregator
 
-final case class Scores(fscore: Double, precision: Double, recall: Double, fpr: Double)
+final case class Scores(mcc: Double,
+                        fscore: Double,
+                        precision: Double,
+                        recall: Double,
+                        accuracy: Double,
+                        fpr: Double)
   extends Serializable
 
 final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double = 1.0)
@@ -34,14 +40,25 @@ final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double 
   def semigroup: Semigroup[ConfusionMatrix] = aggregator.semigroup
 
   def present(m: ConfusionMatrix): Scores = {
-    val precDenom = m.tp.toDouble + m.fp.toDouble
-    val precision = if(precDenom > 0.0) m.tp.toDouble/precDenom else 1.0
+    val fp = m.fp.toDouble
+    val tp = m.tp.toDouble
+    val tn = m.tn.toDouble
+    val fn = m.fn.toDouble
 
-    val recallDenom = m.tp.toDouble + m.fn.toDouble
-    val recall = if(recallDenom > 0.0) m.tp.toDouble/recallDenom else 1.0
+    val mccDenom = sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    val mcc = if(mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0
 
-    val fpDenom = m.fp.toDouble + m.tn.toDouble
-    val fpr = if(fpDenom > 0.0) m.fp.toDouble/fpDenom else 0.0
+    val precDenom = tp + fp
+    val precision = if(precDenom > 0.0) tp/precDenom else 1.0
+
+    val recallDenom = tp + fn
+    val recall = if(recallDenom > 0.0) tp/recallDenom else 1.0
+
+    val accuracyDenom = tp + fn + tn + fp
+    val accuracy = if(accuracyDenom > 0.0) (tp + tn) / accuracyDenom else 0.0
+
+    val fpDenom = fp + tn
+    val fpr = if(fpDenom > 0.0) fp / fpDenom else 0.0
 
     val betaSqr = Math.pow(beta, 2.0)
 
@@ -50,6 +67,6 @@ final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double 
       (1 + betaSqr) * ((precision*recall) / fScoreDenom)
     } else { 1.0 }
 
-    Scores(fscore, precision, recall, fpr)
+    Scores(mcc, fscore, precision, recall, accuracy, fpr)
   }
 }

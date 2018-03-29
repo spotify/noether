@@ -22,10 +22,19 @@ val breezeVersion = "0.13.2"
 val twitterUtil = "18.2.0"
 val algebirdVersion = "0.13.3"
 val scalaTestVersion = "3.0.4"
+val artifactory = "https://artifactory.spotify.net/artifactory/libs-snapshot-local/"
+
+val artifactorySettings = Seq(
+  publishTo             := Some("Artifactory Realm" at artifactory),
+  credentials           ++= Seq(
+    Credentials("Artifactory Realm", "artifactory.spotify.net", "spotify", "dnPAU0MtV2R0ueKy")
+  )
+)
 
 val commonSettings = Seq(
   organization := "com.spotify.ml",
   name := "aggregators",
+  version := "0.0.1-SNAPSHOT",
   description := "ML Aggregators",
   scalaVersion := "2.11.12",
   crossScalaVersions := Seq("2.11.12", "2.12.4"),
@@ -33,8 +42,10 @@ val commonSettings = Seq(
   scalacOptions in (Compile, doc) ++= Seq("-skip-packages", "org.apache"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc)  := Seq("-source", "1.8"),
+) ++ artifactorySettings
 
-  // Release settings
+// Keep this around for the day if/when ml-aggregators becomes OSS?
+val sonatypeSettings = Seq(
   publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
   releaseCrossBuild             := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
@@ -51,7 +62,7 @@ val noPublishSettings = Seq(
 )
 
 lazy val root: Project = Project("root",file(".")
-).settings(commonSettings ++ noPublishSettings).aggregate(aggregators)  
+).settings(commonSettings ++ noPublishSettings).aggregate(aggregators)
 
 lazy val aggregators: Project = Project(
   "aggregators",

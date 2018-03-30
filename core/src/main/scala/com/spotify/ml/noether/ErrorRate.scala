@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package com.spotify.ml.aggregators
+package com.spotify.ml.noether
 
 import com.twitter.algebird.Semigroup
 import com.twitter.algebird.Aggregator

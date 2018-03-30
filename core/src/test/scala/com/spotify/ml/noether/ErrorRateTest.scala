@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package com.spotify.ml.noether
 
 import org.scalactic.TolerantNumerics

@@ -36,3 +36,4 @@ class ConfusionMatrixTest extends FlatSpec with Matchers {
       assert(matrix.tn === 2L)
     }
 }
+

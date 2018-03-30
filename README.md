@@ -1,7 +1,5 @@
 # noether 
 
-Named after Emmy Noether.
-
 This library contains a set of monoids and aggregators for ML oriented tasks in Scala.  The library builds upon
 the aggregators and monoids found in the Algebird Library.
 

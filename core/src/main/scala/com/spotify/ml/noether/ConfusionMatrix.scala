@@ -26,7 +26,7 @@ final case class Prediction(label: Int, score: Double) {
 
 final case class ConfusionMatrix(tp: Long = 0L, fp: Long = 0L, fn: Long = 0L, tn: Long = 0L)
 
-final case class ConfusionMatrixAggregator(threshold: Double = 0.5) 
+final case class ConfusionMatrixAggregator(threshold: Double = 0.5)
   extends Aggregator[Prediction, ConfusionMatrix, ConfusionMatrix]
     with Serializable {
 

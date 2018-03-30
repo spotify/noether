@@ -39,7 +39,15 @@ val commonSettings = Seq(
   publishMavenStyle             := true,
   publishArtifact in Test       := false,
   sonatypeProfileName           := "com.spotify",
-  licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+  licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+  homepage := Some(url("https://github.com/spotify/noether")),
+  scmInfo := Some(ScmInfo(
+    url("https://github.com/spotify/noether.git"),
+    "scm:git:git@github.com:spotify/noether.git")),
+  developers := List(
+    Developer(id="rwhitcomb", name="Richard Whitcomb", email="richwhitjr@gmail.com", url=url("https://twitter.com/rwhitcomb")),
+    Developer(id="fallonfofallon", name="Fallon Chen", email="fallon@spotify.com", url=url("https://twitter.com/fallonfofallon"))
+  )
 )
 
 val noPublishSettings = Seq(

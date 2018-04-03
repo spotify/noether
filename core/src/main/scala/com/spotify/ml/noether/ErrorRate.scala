@@ -24,7 +24,7 @@ final case class ErrorPrediction(scores: List[Double], label: Int) {
   override def toString: String = s"$label,${scores.mkString(":")}"
 }
 
-final case object ErrorRateAggregator extends Aggregator[ErrorPrediction, (Double, Long), Double] {
+case object ErrorRateAggregator extends Aggregator[ErrorPrediction, (Double, Long), Double] {
   def prepare(input: ErrorPrediction): (Double, Long) = {
     val best = input.scores.zipWithIndex.maxBy(_._1)._2
     if(best == input.label) (0.0, 1L) else (1.0, 1L)

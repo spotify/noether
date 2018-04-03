@@ -17,10 +17,10 @@
 
 import sbt.Keys._
 
-val slf4jVersion = "1.7.5"
-val breezeVersion = "0.13.2"
-val twitterUtil = "18.2.0"
-val algebirdVersion = "0.13.3"
+val slf4jVersion = "1.7.25"
+val breezeVersion = "1.0-RC2"
+val twitterUtil = "18.3.0"
+val algebirdVersion = "0.13.4"
 val scalaTestVersion = "3.0.4"
 
 val commonSettings = Seq(
@@ -30,7 +30,6 @@ val commonSettings = Seq(
   scalaVersion := "2.11.12",
   crossScalaVersions := Seq("2.11.12", "2.12.5"),
   scalacOptions ++= Seq("-target:jvm-1.8", "-deprecation", "-feature", "-unchecked"),
-  scalacOptions in (Compile, doc) ++= Seq("-skip-packages", "org.apache"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc)  := Seq("-source", "1.8"),
   publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging),
@@ -70,7 +69,7 @@ lazy val core: Project = Project(
     "org.slf4j" % "slf4j-simple" % slf4jVersion,
     "org.scalanlp" %% "breeze" % breezeVersion,
     "org.scalanlp" %% "breeze-natives" % breezeVersion,
-    "com.twitter" %% "util-collection" % twitterUtil,  
+    "com.twitter" %% "util-collection" % twitterUtil,
     "com.twitter" %% "algebird-core" % algebirdVersion,
     "org.scalatest" %% "scalatest" %  scalaTestVersion
   )

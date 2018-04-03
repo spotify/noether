@@ -18,22 +18,21 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
-import org.scalatest._
 
-class ConfusionMatrixTest extends FlatSpec with Matchers {
+class ConfusionMatrixTest extends AggregatorTest {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "return correct scores" in {
-      val data =
-        List((0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0))
+    val data =
+      List((0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0))
         .map{case(s, pred) => Prediction(pred.toInt, s)}
 
-      val matrix = ConfusionMatrixAggregator()(data)
+    val matrix = run(ConfusionMatrixAggregator())(data)
 
-      assert(matrix.tp === 3L)
-      assert(matrix.fp === 1L)
-      assert(matrix.fn === 1L)
-      assert(matrix.tn === 2L)
-    }
+    assert(matrix.tp === 3L)
+    assert(matrix.fp === 1L)
+    assert(matrix.fn === 1L)
+    assert(matrix.tn === 2L)
+  }
 }
 

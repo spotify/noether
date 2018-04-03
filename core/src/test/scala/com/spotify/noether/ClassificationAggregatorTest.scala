@@ -18,21 +18,20 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
-import org.scalatest._
 
-class ClassificationAggregatorTest extends FlatSpec with Matchers {
+class ClassificationAggregatorTest extends AggregatorTest {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "return correct scores" in {
-      val data =
-        List((0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0))
+    val data =
+      List((0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0))
         .map{case(s, pred) => Prediction(pred.toInt, s)}
 
-      val score = ClassificationAggregator()(data)
+    val score = run(ClassificationAggregator())(data)
 
-      assert(score.recall === 0.75)
-      assert(score.precision === 0.75)
-      assert(score.fscore ===  0.75)
-      assert(score.fpr === 0.333)
-    }
+    assert(score.recall === 0.75)
+    assert(score.precision === 0.75)
+    assert(score.fscore ===  0.75)
+    assert(score.fpr === 0.333)
+  }
 }

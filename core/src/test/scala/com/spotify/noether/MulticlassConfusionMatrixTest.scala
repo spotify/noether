@@ -17,9 +17,7 @@
 
 package com.spotify.noether
 
-import org.scalatest._
-
-class MulticlassConfusionMatrixTest extends FlatSpec with Matchers {
+class MulticlassConfusionMatrixTest extends AggregatorTest {
 
   it should "return correct confusion matrix" in {
     val data =
@@ -33,7 +31,7 @@ class MulticlassConfusionMatrixTest extends FlatSpec with Matchers {
       ).map{case(p, a) => PredictionResult(p, a)}
 
     val labels = Seq(0,1,2)
-    val actual = MulticlassConfusionMatrixAggregator(labels)(data)
+    val actual = run(MulticlassConfusionMatrixAggregator(labels))(data)
 
     val expected = Map[(Int, Int), Long](
       (0,0) -> 3L,

@@ -18,9 +18,8 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
-import org.scalatest._
 
-class AUCAggregatorTest extends FlatSpec with Matchers {
+class AUCAggregatorTest extends AggregatorTest {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   private val data =
@@ -28,11 +27,11 @@ class AUCAggregatorTest extends FlatSpec with Matchers {
       (0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0)
     ).map{case(s, pred) => Prediction(pred.toInt, s)}
 
-  it should "return roc auc" in {
-    assert(AUCAggregator(ROC, samples=50)(data) === 0.7)
+  it should "return ROC AUC" in {
+    assert(run(AUCAggregator(ROC, samples=50))(data) === 0.7)
   }
 
-  it should "return pr auc" in {
-    assert(AUCAggregator(PR, samples=50)(data) === 0.83)
+  it should "return PR AUC" in {
+    assert(run(AUCAggregator(PR, samples=50))(data) === 0.83)
   }
 }

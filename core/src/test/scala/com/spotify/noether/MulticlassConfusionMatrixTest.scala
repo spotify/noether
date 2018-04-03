@@ -28,7 +28,7 @@ class MulticlassConfusionMatrixTest extends AggregatorTest {
         (1,1), (1,1),
         (2,1),
         (2,2), (2,2), (2,2)
-      ).map{case(p, a) => PredictionResult(p, a)}
+      ).map{case(p, a) => Prediction(a, p)}
 
     val labels = Seq(0,1,2)
     val actual = run(MulticlassConfusionMatrixAggregator(labels))(data)

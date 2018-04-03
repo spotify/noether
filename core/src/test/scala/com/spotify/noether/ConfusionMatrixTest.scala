@@ -24,8 +24,8 @@ class ConfusionMatrixTest extends AggregatorTest {
 
   it should "return correct scores" in {
     val data =
-      List((0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0))
-        .map{case(s, pred) => Prediction(pred.toInt, s)}
+      List((0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true))
+        .map{case(s, pred) => Prediction(pred, s)}
 
     val matrix = run(ConfusionMatrixAggregator())(data)
 

@@ -19,21 +19,17 @@ package com.spotify.noether
 
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-final case class Prediction(label: Int, score: Double) {
-  override def toString: String = s"$label,$score"
-}
-
 final case class ConfusionMatrix(tp: Long = 0L, fp: Long = 0L, fn: Long = 0L, tn: Long = 0L)
 
 final case class ConfusionMatrixAggregator(threshold: Double = 0.5)
-  extends Aggregator[Prediction, ConfusionMatrix, ConfusionMatrix] {
+  extends Aggregator[Prediction[Boolean, Double], ConfusionMatrix, ConfusionMatrix] {
 
-    def prepare(input: Prediction): ConfusionMatrix =
-    (input.label, input.score) match {
-      case (1, score) if score > threshold => ConfusionMatrix(tp = 1L)
-      case (1, score) if score < threshold => ConfusionMatrix(fn = 1L)
-      case (0, score) if score < threshold => ConfusionMatrix(tn = 1L)
-      case (0, score) if score > threshold => ConfusionMatrix(fp = 1L)
+    def prepare(input: Prediction[Boolean, Double]): ConfusionMatrix =
+    (input.actual, input.predicted) match {
+      case (true, score) if score > threshold => ConfusionMatrix(tp = 1L)
+      case (true, score) if score < threshold => ConfusionMatrix(fn = 1L)
+      case (false, score) if score < threshold => ConfusionMatrix(tn = 1L)
+      case (false, score) if score > threshold => ConfusionMatrix(fp = 1L)
     }
 
   def semigroup: Semigroup[ConfusionMatrix] =

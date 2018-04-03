@@ -19,12 +19,8 @@ package com.spotify.noether
 
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-final case class LogLossPrediction(scores: List[Double], label: Int) {
-  override def toString: String = s"$label,${scores.mkString(":")}"
-}
-
-case object LogLossAggregator extends Aggregator[LogLossPrediction, (Double, Long), Double] {
-  def prepare(input: LogLossPrediction): (Double, Long) = (math.log(input.scores(input.label)), 1L)
+case object LogLossAggregator extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
+  def prepare(input: Prediction[Int, List[Double]]): (Double, Long) = (math.log(input.predicted(input.actual)), 1L)
   def semigroup: Semigroup[(Double, Long)] = implicitly[Semigroup[(Double, Long)]]
   def present(score: (Double, Long)): Double = -1*(score._1/score._2)
 }

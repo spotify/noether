@@ -22,7 +22,7 @@ val algebirdVersion = "0.13.4"
 val scalaTestVersion = "3.0.5"
 
 val commonSettings = Seq(
-  organization := "com.spotify.ml",
+  organization := "com.spotify",
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.11.12",

@@ -15,21 +15,24 @@
  * under the License.
  */
 
-package com.spotify.ml.noether
+package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
 import org.scalatest.{FlatSpec, Matchers}
 
-class ErrorMatrixTest extends FlatSpec with Matchers {
+class AUCAggregatorTest extends FlatSpec with Matchers {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
-  private val classes = 10
-  private def s(idx: Int): List[Double] =
-    0.until(classes).map(i => if(i == idx) 1.0 else 0.0).toList
 
-  it should "return correct scores" in {
-      val data = List((s(1), 1), (s(3), 1), (s(5), 5), (s(2), 3), (s(0), 0), (s(8), 1))
-        .map{case(scores, label) => ErrorPrediction(scores, label)}
+  private val data =
+    List(
+      (0.1, 0.0), (0.1, 1.0), (0.4, 0.0), (0.6, 0.0), (0.6, 1.0), (0.6, 1.0), (0.8, 1.0)
+    ).map{case(s, pred) => Prediction(pred.toInt, s)}
 
-      assert(ErrorRateAggregator(data) === 0.5)
-    }
+  it should "return roc auc" in {
+    assert(AUCAggregator(ROC, samples=50)(data) === 0.7)
+  }
+
+  it should "return pr auc" in {
+    assert(AUCAggregator(PR, samples=50)(data) === 0.83)
+  }
 }

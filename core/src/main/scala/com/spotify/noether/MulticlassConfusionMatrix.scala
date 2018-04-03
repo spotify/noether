@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package com.spotify.ml.noether
+package com.spotify.noether
 
 import com.twitter.algebird._
 

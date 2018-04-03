@@ -43,8 +43,7 @@ case object ROC extends AUCMetric
 case object PR extends AUCMetric
 
 case class AUCAggregator(metric: AUCMetric, samples: Int = 100)
-  extends Aggregator[Prediction, Curve, Double]
-  with Serializable {
+  extends Aggregator[Prediction, Curve, Double] {
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators = thresholds.data.map(ClassificationAggregator(_)).toList

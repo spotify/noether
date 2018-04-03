@@ -27,8 +27,7 @@ final case class Scores(mcc: Double,
                         fpr: Double)
 
 final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double = 1.0)
-  extends Aggregator[Prediction, ConfusionMatrix, Scores]
-    with Serializable {
+  extends Aggregator[Prediction, ConfusionMatrix, Scores] {
 
   private val aggregator = ConfusionMatrixAggregator(threshold)
 

@@ -26,8 +26,7 @@ final case class Prediction(label: Int, score: Double) {
 final case class ConfusionMatrix(tp: Long = 0L, fp: Long = 0L, fn: Long = 0L, tn: Long = 0L)
 
 final case class ConfusionMatrixAggregator(threshold: Double = 0.5)
-  extends Aggregator[Prediction, ConfusionMatrix, ConfusionMatrix]
-    with Serializable {
+  extends Aggregator[Prediction, ConfusionMatrix, ConfusionMatrix] {
 
     def prepare(input: Prediction): ConfusionMatrix =
     (input.label, input.score) match {
@@ -38,7 +37,7 @@ final case class ConfusionMatrixAggregator(threshold: Double = 0.5)
     }
 
   def semigroup: Semigroup[ConfusionMatrix] =
-    Semigroup.from{case(l, r) =>
+    Semigroup.from { (l, r) =>
       val tp = l.tp + r.tp
       val fp = l.fp + r.fp
       val fn = l.fn + r.fn

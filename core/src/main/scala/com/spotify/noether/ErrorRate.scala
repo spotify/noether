@@ -17,8 +17,7 @@
 
 package com.spotify.noether
 
-import com.twitter.algebird.Semigroup
-import com.twitter.algebird.Aggregator
+import com.twitter.algebird.{Aggregator, Semigroup}
 
 final case class ErrorPrediction(scores: List[Double], label: Int) {
   override def toString: String = s"$label,${scores.mkString(":")}"

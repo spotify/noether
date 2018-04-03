@@ -17,8 +17,8 @@
 
 package com.spotify.noether
 
-import com.twitter.algebird.{Aggregator, Semigroup}
 import breeze.linalg._
+import com.twitter.algebird.{Aggregator, Semigroup}
 
 case class Curve(cm: List[ConfusionMatrix])
 

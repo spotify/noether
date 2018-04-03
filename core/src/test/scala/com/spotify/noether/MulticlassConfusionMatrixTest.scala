@@ -17,7 +17,7 @@
 
 package com.spotify.noether
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest._
 
 class MulticlassConfusionMatrixTest extends FlatSpec with Matchers {
 

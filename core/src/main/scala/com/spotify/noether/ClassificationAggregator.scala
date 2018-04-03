@@ -19,8 +19,6 @@ package com.spotify.noether
 
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-import scala.math.sqrt
-
 final case class Scores(mcc: Double,
                         fscore: Double,
                         precision: Double,
@@ -44,7 +42,7 @@ final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double 
     val tn = m.tn.toDouble
     val fn = m.fn.toDouble
 
-    val mccDenom = sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    val mccDenom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     val mcc = if(mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0
 
     val precDenom = tp + fp

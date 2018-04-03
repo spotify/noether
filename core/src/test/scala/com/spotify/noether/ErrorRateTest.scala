@@ -18,9 +18,9 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest._
 
-class ErrorMatrixTest extends FlatSpec with Matchers {
+class ErrorRateTest extends FlatSpec with Matchers {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
   private val classes = 10
   private def s(idx: Int): List[Double] =

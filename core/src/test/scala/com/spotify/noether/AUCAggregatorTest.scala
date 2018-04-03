@@ -18,7 +18,7 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest._
 
 class AUCAggregatorTest extends FlatSpec with Matchers {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)

@@ -17,8 +17,7 @@
 
 package com.spotify.noether
 
-import com.twitter.algebird.Semigroup
-import com.twitter.algebird.Aggregator
+import com.twitter.algebird.{Aggregator, Semigroup}
 
 final case class Prediction(label: Int, score: Double) {
   override def toString: String = s"$label,$score"

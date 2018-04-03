@@ -17,7 +17,7 @@
 
 package com.spotify.noether
 
-import com.twitter.algebird._
+import com.twitter.algebird.{Aggregator, Semigroup}
 
 final case class PredictionResult(predicted: Int, actual: Int)
 

@@ -23,9 +23,9 @@ class ClassificationAggregatorTest extends AggregatorTest {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "return correct scores" in {
-    val data =
-      List((0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true))
-        .map{case(s, pred) => Prediction(pred, s)}
+    val data = List(
+      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
+    ).map{case(s, pred) => Prediction(pred, s)}
 
     val score = run(ClassificationAggregator())(data)
 

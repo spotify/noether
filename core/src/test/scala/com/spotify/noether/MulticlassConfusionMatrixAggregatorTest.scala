@@ -17,7 +17,7 @@
 
 package com.spotify.noether
 
-class MulticlassConfusionMatrixTest extends AggregatorTest {
+class MulticlassConfusionMatrixAggregatorTest extends AggregatorTest {
 
   it should "return correct confusion matrix" in {
     val data =

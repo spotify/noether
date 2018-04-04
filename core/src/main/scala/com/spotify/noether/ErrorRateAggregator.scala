@@ -17,18 +17,14 @@
 
 package com.spotify.noether
 
-import org.scalactic.TolerantNumerics
+import com.twitter.algebird.{Aggregator, Semigroup}
 
-class ErrorRateTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
-  private val classes = 10
-  private def s(idx: Int): List[Double] =
-    0.until(classes).map(i => if(i == idx) 1.0 else 0.0).toList
-
-  it should "return correct scores" in {
-      val data = List((s(1), 1), (s(3), 1), (s(5), 5), (s(2), 3), (s(0), 0), (s(8), 1))
-        .map{case(scores, label) => Prediction(label, scores)}
-
-      assert(run(ErrorRateAggregator)(data) === 0.5)
-    }
+case object ErrorRateAggregator
+  extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
+  def prepare(input: Prediction[Int, List[Double]]): (Double, Long) = {
+    val best = input.predicted.zipWithIndex.maxBy(_._1)._2
+    if(best == input.actual) (0.0, 1L) else (1.0, 1L)
+  }
+  def semigroup: Semigroup[(Double, Long)] = implicitly[Semigroup[(Double, Long)]]
+  def present(score: (Double, Long)): Double = score._1/score._2
 }

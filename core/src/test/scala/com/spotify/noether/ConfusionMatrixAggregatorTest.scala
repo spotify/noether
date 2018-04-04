@@ -17,13 +17,22 @@
 
 package com.spotify.noether
 
-import com.twitter.algebird.{Aggregator, Semigroup}
+import org.scalactic.TolerantNumerics
 
-case object ErrorRateAggregator extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
-  def prepare(input: Prediction[Int, List[Double]]): (Double, Long) = {
-    val best = input.predicted.zipWithIndex.maxBy(_._1)._2
-    if(best == input.actual) (0.0, 1L) else (1.0, 1L)
+class ConfusionMatrixAggregatorTest extends AggregatorTest {
+  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
+
+  it should "return correct scores" in {
+    val data = List(
+      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
+    ).map{case(s, pred) => Prediction(pred, s)}
+
+    val matrix = run(ConfusionMatrixAggregator())(data)
+
+    assert(matrix.tp === 3L)
+    assert(matrix.fp === 1L)
+    assert(matrix.fn === 1L)
+    assert(matrix.tn === 2L)
   }
-  def semigroup: Semigroup[(Double, Long)] = implicitly[Semigroup[(Double, Long)]]
-  def present(score: (Double, Long)): Double = score._1/score._2
 }
+

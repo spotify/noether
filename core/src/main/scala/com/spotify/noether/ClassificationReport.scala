@@ -16,7 +16,6 @@
  */
 
 package com.spotify.noether
-
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 final case class Scores(mcc: Double,
@@ -27,19 +26,24 @@ final case class Scores(mcc: Double,
                         fpr: Double)
 
 final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double = 1.0)
-  extends Aggregator[Prediction[Boolean, Double], ConfusionMatrix, Scores] {
+  extends Aggregator[Prediction[Boolean, Double], Map[(Int, Int), Long], Scores] {
 
-  private val aggregator = ConfusionMatrixAggregator(threshold)
+  private val aggregator = ConfusionMatrix(Seq(0, 1))
 
-  def prepare(input: Prediction[Boolean, Double]): ConfusionMatrix = aggregator.prepare(input)
+  def prepare(input: Prediction[Boolean, Double]): Map[(Int, Int), Long] = {
+    val predicted = Prediction(if(input.actual) 1 else 0, if(input.predicted > threshold) 1 else 0)
+    aggregator.prepare(predicted)
+  }
 
-  def semigroup: Semigroup[ConfusionMatrix] = aggregator.semigroup
+  def semigroup: Semigroup[Map[(Int, Int), Long]] = aggregator.semigroup
 
-  def present(m: ConfusionMatrix): Scores = {
-    val fp = m.fp.toDouble
-    val tp = m.tp.toDouble
-    val tn = m.tn.toDouble
-    val fn = m.fn.toDouble
+  def present(m: Map[(Int, Int), Long]): Scores = {
+    val mat = aggregator.present(m)
+
+    val fp = mat(1, 0).toDouble
+    val tp = mat(1, 1).toDouble
+    val tn = mat(0, 0).toDouble
+    val fn = mat(0, 1).toDouble
 
     val mccDenom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     val mcc = if(mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0

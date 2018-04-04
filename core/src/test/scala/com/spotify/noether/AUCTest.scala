@@ -19,20 +19,19 @@ package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
 
-class ConfusionMatrixAggregatorTest extends AggregatorTest {
+class AUCTest extends AggregatorTest {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
 
-  it should "return correct scores" in {
-    val data = List(
+  private val data =
+    List(
       (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
     ).map{case(s, pred) => Prediction(pred, s)}
 
-    val matrix = run(ConfusionMatrixAggregator())(data)
+  it should "return ROC AUC" in {
+    assert(run(AUCAggregator(ROC, samples=50))(data) === 0.7)
+  }
 
-    assert(matrix.tp === 3L)
-    assert(matrix.fp === 1L)
-    assert(matrix.fn === 1L)
-    assert(matrix.tn === 2L)
+  it should "return PR AUC" in {
+    assert(run(AUCAggregator(PR, samples=50))(data) === 0.83)
   }
 }
-

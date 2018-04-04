@@ -19,7 +19,7 @@ package com.spotify.noether
 
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-case object ErrorRateAggregator
+case object ErrorRateSummary
   extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
   def prepare(input: Prediction[Int, List[Double]]): (Double, Long) = {
     val best = input.predicted.zipWithIndex.maxBy(_._1)._2

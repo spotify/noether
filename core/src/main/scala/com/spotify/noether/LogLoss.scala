@@ -17,21 +17,12 @@
 
 package com.spotify.noether
 
-import org.scalactic.TolerantNumerics
+import com.twitter.algebird.{Aggregator, Semigroup}
 
-class ClassificationAggregatorTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
-
-  it should "return correct scores" in {
-    val data = List(
-      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
-    ).map{case(s, pred) => Prediction(pred, s)}
-
-    val score = run(ClassificationAggregator())(data)
-
-    assert(score.recall === 0.75)
-    assert(score.precision === 0.75)
-    assert(score.fscore ===  0.75)
-    assert(score.fpr === 0.333)
-  }
+case object LogLoss
+  extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
+  def prepare(input: Prediction[Int, List[Double]]): (Double, Long) =
+    (math.log(input.predicted(input.actual)), 1L)
+  def semigroup: Semigroup[(Double, Long)] = implicitly[Semigroup[(Double, Long)]]
+  def present(score: (Double, Long)): Double = -1*(score._1/score._2)
 }

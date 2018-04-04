@@ -19,16 +19,19 @@ package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
 
-class ErrorRateAggregatorTest extends AggregatorTest {
+class ClassificationReportTest extends AggregatorTest {
   private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
-  private val classes = 10
-  private def s(idx: Int): List[Double] =
-    0.until(classes).map(i => if(i == idx) 1.0 else 0.0).toList
 
   it should "return correct scores" in {
-      val data = List((s(1), 1), (s(3), 1), (s(5), 5), (s(2), 3), (s(0), 0), (s(8), 1))
-        .map{case(scores, label) => Prediction(label, scores)}
+    val data = List(
+      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
+    ).map{case(s, pred) => Prediction(pred, s)}
 
-      assert(run(ErrorRateAggregator)(data) === 0.5)
-    }
+    val score = run(ClassificationAggregator())(data)
+
+    assert(score.recall === 0.75)
+    assert(score.precision === 0.75)
+    assert(score.fscore ===  0.75)
+    assert(score.fpr === 0.333)
+  }
 }

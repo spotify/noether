@@ -17,7 +17,11 @@
 
 package com.spotify.noether
 
-class MulticlassConfusionMatrixAggregatorTest extends AggregatorTest {
+import breeze.linalg.DenseMatrix
+import org.scalactic.TolerantNumerics
+
+class ConfusionMatrixTest extends AggregatorTest {
+  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "return correct confusion matrix" in {
     val data =
@@ -31,19 +35,31 @@ class MulticlassConfusionMatrixAggregatorTest extends AggregatorTest {
       ).map{case(p, a) => Prediction(a, p)}
 
     val labels = Seq(0,1,2)
-    val actual = run(MulticlassConfusionMatrixAggregator(labels))(data)
+    val actual = run(ConfusionMatrix(labels))(data)
 
-    val expected = Map[(Int, Int), Long](
-      (0,0) -> 3L,
-      (0,1) -> 2L,
-      (0,2) -> 0L,
-      (1,0) -> 4L,
-      (1,1) -> 2L,
-      (1,2) -> 0L,
-      (2,0) -> 0L,
-      (2,1) -> 1L,
-      (2,2) -> 3L
-    )
-    assert(actual == expected)
+    val mat = DenseMatrix.zeros[Long](labels.size, labels.size)
+    mat(0,0) = 3L
+    mat(0,1) = 2L
+    mat(0,2) = 0L
+    mat(1,0) = 4L
+    mat(1,1) = 2L
+    mat(1,2) = 0L
+    mat(2,0) = 0L
+    mat(2,1) = 1L
+    mat(2,2) = 3L
+    assert(actual == mat)
+  }
+
+  it should "return correct scores" in {
+    val data = List(
+      (0, 0), (0, 1), (0, 0), (1, 0), (1, 1), (1, 1), (1, 1)
+    ).map{case(s, pred) => Prediction(pred, s)}
+
+    val matrix = run(ConfusionMatrix(Seq(0,1)))(data)
+
+    assert(matrix(1, 1) === 3L)
+    assert(matrix(0, 1) === 1L)
+    assert(matrix(1, 0) === 1L)
+    assert(matrix(0, 0) === 2L)
   }
 }

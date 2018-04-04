@@ -20,7 +20,7 @@ package com.spotify.noether
 import breeze.linalg._
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-case class Curve(cm: List[ConfusionMatrix])
+case class Curve(cm: List[Map[(Int, Int), Long]])
 
 object AreaUnderCurve {
   def trapezoid(points: Seq[(Double, Double)]): Double = {

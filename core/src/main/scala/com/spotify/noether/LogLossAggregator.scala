@@ -19,15 +19,10 @@ package com.spotify.noether
 
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-final case class ErrorPrediction(scores: List[Double], label: Int) {
-  override def toString: String = s"$label,${scores.mkString(":")}"
-}
-
-case object ErrorRateAggregator extends Aggregator[ErrorPrediction, (Double, Long), Double] {
-  def prepare(input: ErrorPrediction): (Double, Long) = {
-    val best = input.scores.zipWithIndex.maxBy(_._1)._2
-    if(best == input.label) (0.0, 1L) else (1.0, 1L)
-  }
+case object LogLossAggregator
+  extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
+  def prepare(input: Prediction[Int, List[Double]]): (Double, Long) =
+    (math.log(input.predicted(input.actual)), 1L)
   def semigroup: Semigroup[(Double, Long)] = implicitly[Semigroup[(Double, Long)]]
-  def present(score: (Double, Long)): Double = score._1/score._2
+  def present(score: (Double, Long)): Double = -1*(score._1/score._2)
 }

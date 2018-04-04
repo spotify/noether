@@ -19,12 +19,10 @@ package com.spotify.noether
 
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-final case class PredictionResult(predicted: Int, actual: Int)
-
 final case class MulticlassConfusionMatrixAggregator(labels: Seq[Int])
-  extends Aggregator[PredictionResult, Map[(Int, Int), Long], Map[(Int, Int), Long]] {
+  extends Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], Map[(Int, Int), Long]] {
 
-  def prepare(input: PredictionResult): Map[(Int, Int), Long] = {
+  def prepare(input: Prediction[Int, Int]): Map[(Int, Int), Long] = {
     Map((input.predicted, input.actual) -> 1L)
   }
 

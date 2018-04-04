@@ -43,12 +43,12 @@ case object ROC extends AUCMetric
 case object PR extends AUCMetric
 
 case class AUCAggregator(metric: AUCMetric, samples: Int = 100)
-  extends Aggregator[Prediction, Curve, Double] {
+  extends Aggregator[Prediction[Boolean, Double], Curve, Double] {
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators = thresholds.data.map(ClassificationAggregator(_)).toList
 
-  def prepare(input: Prediction): Curve = Curve(aggregators.map(_.prepare(input)))
+  def prepare(input: Prediction[Boolean, Double]): Curve = Curve(aggregators.map(_.prepare(input)))
 
   def semigroup: Semigroup[Curve] = {
     val sg = ClassificationAggregator().semigroup

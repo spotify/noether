@@ -17,21 +17,6 @@
 
 package com.spotify.noether
 
-import org.scalactic.TolerantNumerics
-
-class AUCAggregatorTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
-
-  private val data =
-    List(
-      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
-    ).map{case(s, pred) => Prediction(pred, s)}
-
-  it should "return ROC AUC" in {
-    assert(run(AUCAggregator(ROC, samples=50))(data) === 0.7)
-  }
-
-  it should "return PR AUC" in {
-    assert(run(AUCAggregator(PR, samples=50))(data) === 0.83)
-  }
+final case class Prediction[L, S](actual: L, predicted: S) {
+  override def toString: String = s"$actual,$predicted"
 }

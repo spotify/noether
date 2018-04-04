@@ -27,11 +27,11 @@ final case class Scores(mcc: Double,
                         fpr: Double)
 
 final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double = 1.0)
-  extends Aggregator[Prediction, ConfusionMatrix, Scores] {
+  extends Aggregator[Prediction[Boolean, Double], ConfusionMatrix, Scores] {
 
   private val aggregator = ConfusionMatrixAggregator(threshold)
 
-  def prepare(input: Prediction): ConfusionMatrix = aggregator.prepare(input)
+  def prepare(input: Prediction[Boolean, Double]): ConfusionMatrix = aggregator.prepare(input)
 
   def semigroup: Semigroup[ConfusionMatrix] = aggregator.semigroup
 

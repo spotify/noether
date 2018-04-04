@@ -17,14 +17,18 @@
 
 package com.spotify.noether
 
-import com.twitter.algebird.{Aggregator, Semigroup}
+import org.scalactic.TolerantNumerics
 
-final case class LogLossPrediction(scores: List[Double], label: Int) {
-  override def toString: String = s"$label,${scores.mkString(":")}"
-}
+class LogLossAggregatorTest extends AggregatorTest {
+  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
+  private val classes = 10
+  private def s(idx: Int, score: Double): List[Double] =
+    0.until(classes).map(i => if(i == idx) score else 0.0).toList
 
-case object LogLossAggregator extends Aggregator[LogLossPrediction, (Double, Long), Double] {
-  def prepare(input: LogLossPrediction): (Double, Long) = (math.log(input.scores(input.label)), 1L)
-  def semigroup: Semigroup[(Double, Long)] = implicitly[Semigroup[(Double, Long)]]
-  def present(score: (Double, Long)): Double = -1*(score._1/score._2)
+  it should "return correct scores" in {
+      val data = List((s(0, 0.8), 0), (s(1, 0.6), 1), (s(2, 0.7), 2))
+        .map{case(scores, label) => Prediction(label, scores)}
+
+      assert(run(LogLossAggregator)(data) === 0.363548039673)
+    }
 }

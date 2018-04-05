@@ -17,27 +17,30 @@
 
 package com.spotify.noether
 
-import java.io.{ByteArrayOutputStream, ObjectOutputStream}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
 import com.twitter.algebird.Aggregator
 import org.scalatest._
 
 trait AggregatorTest extends FlatSpec with Matchers {
   def run[A, B, C](aggregator: Aggregator[A, B, C])(as: Seq[A]): C = {
-    val bs = as.map(aggregator.prepare)
-    bs.foreach(ensureSerializable)
-    val b = aggregator.reduce(bs)
-    ensureSerializable(b)
-    val c = aggregator.present(b)
-    ensureSerializable(c)
-    c
+    val bs = as.map(aggregator.prepare _ compose ensureSerializable)
+    val b = ensureSerializable(aggregator.reduce(bs))
+    ensureSerializable(aggregator.present(b))
   }
 
-  private def ensureSerializable[A](a: A): Unit = {
-    val baos = new ByteArrayOutputStream()
-    val oos = new ObjectOutputStream(baos)
-    oos.writeObject(a)
-    oos.close()
-    baos.close()
+  private def serializeToByteArray(value: Any): Array[Byte] = {
+    val buffer = new ByteArrayOutputStream()
+    val oos = new ObjectOutputStream(buffer)
+    oos.writeObject(value)
+    buffer.toByteArray
   }
+
+  private def deserializeFromByteArray(encodedValue: Array[Byte]): AnyRef = {
+    val ois = new ObjectInputStream(new ByteArrayInputStream(encodedValue))
+    ois.readObject()
+  }
+
+  private def ensureSerializable[T](value: T): T =
+    deserializeFromByteArray(serializeToByteArray(value)).asInstanceOf[T]
 }

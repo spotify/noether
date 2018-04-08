@@ -29,7 +29,7 @@ These Aggregators are meant for a single binary label and a score that is a vali
 
 ### Multi-class
 
-These Aggregators are meant for a multi-class setup where the scores a distribtion over labels and the label is an int representing the label.
+These Aggregators are meant for a multi-class setup where the scores a distribution over labels and the label is an int representing the label.
 
 1. Error Rate
 1. Log Loss

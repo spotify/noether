@@ -27,7 +27,7 @@ class ClassificationReportTest extends AggregatorTest {
       (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
     ).map{case(s, pred) => Prediction(pred, s)}
 
-    val score = run(ClassificationAggregator())(data)
+    val score = run(ClassificationReport())(data)
 
     assert(score.recall === 0.75)
     assert(score.precision === 0.75)

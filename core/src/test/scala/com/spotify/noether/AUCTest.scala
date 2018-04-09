@@ -28,10 +28,10 @@ class AUCTest extends AggregatorTest {
     ).map{case(s, pred) => Prediction(pred, s)}
 
   it should "return ROC AUC" in {
-    assert(run(AUCAggregator(ROC, samples=50))(data) === 0.7)
+    assert(run(AUC(ROC, samples=50))(data) === 0.7)
   }
 
   it should "return PR AUC" in {
-    assert(run(AUCAggregator(PR, samples=50))(data) === 0.83)
+    assert(run(AUC(PR, samples=50))(data) === 0.83)
   }
 }

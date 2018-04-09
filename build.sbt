@@ -54,10 +54,10 @@ val noPublishSettings = Seq(
 )
 
 lazy val root: Project = Project("root",file(".")
-).settings(commonSettings ++ noPublishSettings).aggregate(core)
+).settings(commonSettings ++ noPublishSettings).aggregate(noetherCore, noetherExamples)
 
-lazy val core: Project = Project(
-  "core",
+lazy val noetherCore: Project = Project(
+  "noether-core",
   file("core")
 ).settings(
   commonSettings,
@@ -69,3 +69,12 @@ lazy val core: Project = Project(
     "org.scalatest" %% "scalatest" %  scalaTestVersion
   )
 )
+
+lazy val noetherExamples: Project = Project(
+  "noether-examples",
+  file("examples")
+).settings(
+  commonSettings,
+  moduleName := "noether-examples",
+  description := "Noether Examples"
+).dependsOn(noetherCore)

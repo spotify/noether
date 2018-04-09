@@ -24,14 +24,20 @@ class AUCTest extends AggregatorTest {
 
   private val data =
     List(
-      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
-    ).map{case(s, pred) => Prediction(pred, s)}
+      (0.1, false),
+      (0.1, true),
+      (0.4, false),
+      (0.6, false),
+      (0.6, true),
+      (0.6, true),
+      (0.8, true)
+    ).map { case (s, pred) => Prediction(pred, s) }
 
   it should "return ROC AUC" in {
-    assert(run(AUC(ROC, samples=50))(data) === 0.7)
+    assert(run(AUC(ROC, samples = 50))(data) === 0.7)
   }
 
   it should "return PR AUC" in {
-    assert(run(AUC(PR, samples=50))(data) === 0.83)
+    assert(run(AUC(PR, samples = 50))(data) === 0.83)
   }
 }

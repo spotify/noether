@@ -1,0 +1,29 @@
+maxColumn = 100
+
+includeCurlyBraceInSelectChains = false
+
+optIn.breakChainOnFirstMethodDot = false
+
+binPack.literalArgumentLists = true
+
+continuationIndent {
+  callSite = 2
+  defnSite = 2
+}
+
+newlines {
+  afterImplicitKWInVerticalMultiline = true
+  beforeImplicitKWInVerticalMultiline = true
+  sometimesBeforeColonInMethodReturnType = true
+}
+
+align = none
+
+docstrings = JavaDoc
+
+project.git = false
+
+rewrite {
+  rules = [PreferCurlyFors, RedundantBraces, RedundantParens, SortImports]
+  redundantBraces.maxLines = 1
+}

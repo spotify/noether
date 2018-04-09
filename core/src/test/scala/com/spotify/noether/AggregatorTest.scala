@@ -17,7 +17,12 @@
 
 package com.spotify.noether
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectInputStream,
+  ObjectOutputStream
+}
 
 import com.twitter.algebird.Aggregator
 import org.scalatest._

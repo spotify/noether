@@ -18,13 +18,13 @@
 package com.spotify.noether
 
 /**
- * Generic Prediction Object used by most aggregators
- *
- * @param actual Real value for this entry.  Also normally seen as label.
- * @param predicted Predicted value.  Can be a class or a score depending on the aggregator.
- * @tparam L Type of the Real Value
- * @tparam S Type of the Predicted Value
- */
+  * Generic Prediction Object used by most aggregators
+  *
+  * @param actual Real value for this entry.  Also normally seen as label.
+  * @param predicted Predicted value.  Can be a class or a score depending on the aggregator.
+  * @tparam L Type of the Real Value
+  * @tparam S Type of the Predicted Value
+  */
 final case class Prediction[L, S](actual: L, predicted: S) {
   override def toString: String = s"$actual,$predicted"
 }

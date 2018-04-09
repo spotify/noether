@@ -17,21 +17,20 @@
 
 package com.spotify.noether
 
-import org.scalactic.TolerantNumerics
+import com.twitter.algebird.MultiAggregator
 
-class ClassificationReportTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
+object AggregatorExample {
+  def main(args: Array[String]): Unit = {
+    val multiAggregator =
+      MultiAggregator(AUC(ROC), AUC(PR), ClassificationReport(), BinaryConfusionMatrix())
+        .andThenPresent{case (roc, pr, report, cm) =>
+          (roc, pr, report.accuracy, report.recall, report.precision, cm(1, 1), cm(0, 0))
+        }
 
-  it should "return correct scores" in {
-    val data = List(
-      (0.1, false), (0.1, true), (0.4, false), (0.6, false), (0.6, true), (0.6, true), (0.8, true)
-    ).map{case(s, pred) => Prediction(pred, s)}
+    val predictions = List(Prediction(false, 0.1), Prediction(false, 0.6), Prediction(true, 0.9))
 
-    val score = run(ClassificationReport())(data)
-
-    assert(score.recall === 0.75)
-    assert(score.precision === 0.75)
-    assert(score.fscore ===  0.75)
-    assert(score.fpr === 0.333)
+    // scalastyle:off regex
+    println(multiAggregator.apply(predictions))
+    // scalastyle:on regex
   }
 }

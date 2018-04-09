@@ -21,8 +21,6 @@ import breeze.linalg.DenseMatrix
 import org.scalactic.TolerantNumerics
 
 class ConfusionMatrixTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
-
   it should "return correct confusion matrix" in {
     val data =
       List(

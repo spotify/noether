@@ -18,26 +18,46 @@
 package com.spotify.noether
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-final case class Scores(mcc: Double,
+/**
+ * Classification Report
+ *
+ * @param mcc <a href="https://bit.ly/2Jw7vL3"> Matthews Correlation Coefficient </a>
+ * @param fscore <a href="https://en.wikipedia.org/wiki/F1_score"> f-score </a>
+ * @param precision <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Precision </a>
+ * @param recall <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Recall </a>
+ * @param accuracy <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision"> Accuracy </a>
+ * @param fpr <a href="https://en.wikipedia.org/wiki/False_positive_rate"> False Positive Rate </a>
+ */
+final case class Report(mcc: Double,
                         fscore: Double,
                         precision: Double,
                         recall: Double,
                         accuracy: Double,
                         fpr: Double)
 
-final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double = 1.0)
-  extends Aggregator[Prediction[Boolean, Double], Map[(Int, Int), Long], Scores] {
+/**
+ * Generate a Classification Report for a collection of binary predictions.
+ * The output of this aggregator will be a [[Report]] object.
+ *
+ * @param threshold Threshold to apply to get the predictions.
+ * @param beta Beta parameter used in the f-score calculation.
+ */
+final case class ClassificationReport(threshold: Double = 0.5, beta: Double = 1.0)
+  extends Aggregator[Prediction[Boolean, Double], Map[(Int, Int), Long], Report] {
 
   private val aggregator = ConfusionMatrix(Seq(0, 1))
 
   def prepare(input: Prediction[Boolean, Double]): Map[(Int, Int), Long] = {
-    val predicted = Prediction(if(input.actual) 1 else 0, if(input.predicted > threshold) 1 else 0)
+    val predicted = Prediction(
+      if(input.actual) 1 else 0,
+      if(input.predicted > threshold) 1 else 0
+    )
     aggregator.prepare(predicted)
   }
 
   def semigroup: Semigroup[Map[(Int, Int), Long]] = aggregator.semigroup
 
-  def present(m: Map[(Int, Int), Long]): Scores = {
+  def present(m: Map[(Int, Int), Long]): Report = {
     val mat = aggregator.present(m)
 
     val fp = mat(1, 0).toDouble
@@ -67,6 +87,6 @@ final case class ClassificationAggregator(threshold: Double = 0.5, beta: Double 
       (1 + betaSqr) * ((precision*recall) / fScoreDenom)
     } else { 1.0 }
 
-    Scores(mcc, fscore, precision, recall, accuracy, fpr)
+    Report(mcc, fscore, precision, recall, accuracy, fpr)
   }
 }

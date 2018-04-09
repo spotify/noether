@@ -20,9 +20,9 @@ package com.spotify.noether
 import breeze.linalg._
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-case class Curve(cm: List[Map[(Int, Int), Long]])
+private[noether] case class Curve(cm: List[Map[(Int, Int), Long]])
 
-object AreaUnderCurve {
+private[noether] object AreaUnderCurve {
   def trapezoid(points: Seq[(Double, Double)]): Double = {
     require(points.length == 2)
     val x = points.head
@@ -38,26 +38,55 @@ object AreaUnderCurve {
   }
 }
 
+/**
+ * Which function to apply on the list of confusion matrices prior to the AUC calculation.
+ */
 sealed trait AUCMetric
+
+/**
+ * <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">
+ *   Receiver operating characteristic Curve
+ * </a>
+ */
 case object ROC extends AUCMetric
+
+/**
+ * <a href="https://en.wikipedia.org/wiki/Precision_and_recall">
+ *   Precision Recall Curve
+ * </a>
+ */
 case object PR extends AUCMetric
 
-case class AUCAggregator(metric: AUCMetric, samples: Int = 100)
+/**
+ * Compute the "Area Under the Curve" for a collection of predictions. Uses the Trapezoid method to
+ * compute the area.
+ *
+ * Internally a linspace is defined using the given number of [[samples]]. Each point in the
+ * linspace represents a threshold which is used to build a confusion matrix.
+ * The area is then defined on this list of confusion matrices.
+ *
+ * [[AUCMetric]] which is given to the aggregate selects the function to apply on
+ * the confusion matrix prior to the AUC calculation.
+ *
+ * @param metric  Which function to apply on the confusion matrix.
+ * @param samples Number of samples to use for the curve definition.
+ */
+case class AUC(metric: AUCMetric, samples: Int = 100)
   extends Aggregator[Prediction[Boolean, Double], Curve, Double] {
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
-  private lazy val aggregators = thresholds.data.map(ClassificationAggregator(_)).toList
+  private lazy val aggregators = thresholds.data.map(ClassificationReport(_)).toList
 
   def prepare(input: Prediction[Boolean, Double]): Curve = Curve(aggregators.map(_.prepare(input)))
 
   def semigroup: Semigroup[Curve] = {
-    val sg = ClassificationAggregator().semigroup
+    val sg = ClassificationReport().semigroup
     Semigroup.from{case(l, r) => Curve(l.cm.zip(r.cm).map{case(cl, cr) => sg.plus(cl, cr)})}
   }
 
   def present(c: Curve): Double = {
     val total = c.cm.map { matrix =>
-      val scores = ClassificationAggregator().present(matrix)
+      val scores = ClassificationReport().present(matrix)
       metric match {
         case ROC => (scores.fpr, scores.recall)
         case PR => (scores.recall, scores.precision)

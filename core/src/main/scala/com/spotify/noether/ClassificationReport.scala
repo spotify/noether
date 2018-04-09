@@ -21,7 +21,7 @@ import com.twitter.algebird.{Aggregator, Semigroup}
 /**
  * Classification Report
  *
- * @param mcc <a href="https://en.wikipedia.org/wiki/Matthews_correlation_coefficient"> Matthews Correlation Coefficient </a>
+ * @param mcc <a href="https://bit.ly/2Jw7vL3"> Matthews Correlation Coefficient </a>
  * @param fscore <a href="https://en.wikipedia.org/wiki/F1_score"> f-score </a>
  * @param precision <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Precision </a>
  * @param recall <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Recall </a>
@@ -48,7 +48,10 @@ final case class ClassificationReport(threshold: Double = 0.5, beta: Double = 1.
   private val aggregator = ConfusionMatrix(Seq(0, 1))
 
   def prepare(input: Prediction[Boolean, Double]): Map[(Int, Int), Long] = {
-    val predicted = Prediction(if(input.actual) 1 else 0, if(input.predicted > threshold) 1 else 0)
+    val predicted = Prediction(
+      if(input.actual) 1 else 0,
+      if(input.predicted > threshold) 1 else 0
+    )
     aggregator.prepare(predicted)
   }
 

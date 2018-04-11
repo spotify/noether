@@ -48,7 +48,7 @@ final case class ClassificationReport(threshold: Double = 0.5,
                        Map[(Int, Int), Long],
                        Report] {
 
-  private val aggregator = ConfusionMatrix(Seq(0, 1))
+  private val aggregator = MultiClassificationReport(Seq(0, 1))
 
   def prepare(input: Prediction[Boolean, Double]): Map[(Int, Int), Long] = {
     val predicted = Prediction(
@@ -60,36 +60,75 @@ final case class ClassificationReport(threshold: Double = 0.5,
 
   def semigroup: Semigroup[Map[(Int, Int), Long]] = aggregator.semigroup
 
-  def present(m: Map[(Int, Int), Long]): Report = {
-    val mat = aggregator.present(m)
+  def present(m: Map[(Int, Int), Long]): Report = aggregator.present(m)(1)
+}
 
-    val fp = mat(1, 0).toDouble
-    val tp = mat(1, 1).toDouble
-    val tn = mat(0, 0).toDouble
-    val fn = mat(0, 1).toDouble
+/**
+  * Generate a Classification Report for a collection of multiclass predictions. A report is
+  * generated for each class by treating the predictions as binary of either "class" or "not class".
+  * The output of this aggregator will be a map of classes and their [[Report]] objects.
+  *
+  * @param labels List of possible label values.
+  * @param beta Beta parameter used in the f-score calculation.
+  */
+final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
+    extends Aggregator[Prediction[Int, Int],
+                       Map[(Int, Int), Long],
+                       Map[Int, Report]] {
 
-    val mccDenom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
-    val mcc = if (mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0
+  private val aggregator = ConfusionMatrix(labels)
 
-    val precDenom = tp + fp
-    val precision = if (precDenom > 0.0) tp / precDenom else 1.0
+  override def prepare(input: Prediction[Int, Int]): Map[(Int, Int), Long] =
+    aggregator.prepare(input)
 
-    val recallDenom = tp + fn
-    val recall = if (recallDenom > 0.0) tp / recallDenom else 1.0
+  override def semigroup: Semigroup[Map[(Int, Int), Long]] =
+    aggregator.semigroup
 
-    val accuracyDenom = tp + fn + tn + fp
-    val accuracy = if (accuracyDenom > 0.0) (tp + tn) / accuracyDenom else 0.0
+  //scalastyle:off cyclomatic.complexity
+  override def present(m: Map[(Int, Int), Long]): Map[Int, Report] = {
+    val mat = m.withDefaultValue(0L)
+    labels.foldLeft(Map.empty[Int, Report]) { (result, clazz) =>
+      val fp = mat
+        .filterKeys { case (p, a) => p == clazz && a != clazz }
+        .values
+        .sum
+        .toDouble
+      val tp = mat(clazz -> clazz).toDouble
+      val tn = mat
+        .filterKeys { case (p, a) => p != clazz && a != clazz }
+        .values
+        .sum
+        .toDouble
+      val fn = mat
+        .filterKeys { case (p, a) => p != clazz && a == clazz }
+        .values
+        .sum
+        .toDouble
 
-    val fpDenom = fp + tn
-    val fpr = if (fpDenom > 0.0) fp / fpDenom else 0.0
+      val mccDenom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+      val mcc = if (mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0
 
-    val betaSqr = Math.pow(beta, 2.0)
+      val precDenom = tp + fp
+      val precision = if (precDenom > 0.0) tp / precDenom else 1.0
 
-    val fScoreDenom = (betaSqr * precision) + recall
-    val fscore = if (fScoreDenom > 0.0) {
-      (1 + betaSqr) * ((precision * recall) / fScoreDenom)
-    } else { 1.0 }
+      val recallDenom = tp + fn
+      val recall = if (recallDenom > 0.0) tp / recallDenom else 1.0
 
-    Report(mcc, fscore, precision, recall, accuracy, fpr)
+      val accuracyDenom = tp + fn + tn + fp
+      val accuracy = if (accuracyDenom > 0.0) (tp + tn) / accuracyDenom else 0.0
+
+      val fpDenom = fp + tn
+      val fpr = if (fpDenom > 0.0) fp / fpDenom else 0.0
+
+      val betaSqr = Math.pow(beta, 2.0)
+
+      val fScoreDenom = (betaSqr * precision) + recall
+      val fscore = if (fScoreDenom > 0.0) {
+        (1 + betaSqr) * ((precision * recall) / fScoreDenom)
+      } else { 1.0 }
+
+      result + (clazz -> Report(mcc, fscore, precision, recall, accuracy, fpr))
+    }
   }
+  //scalastyle:on cyclomatic.complexity
 }

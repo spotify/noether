@@ -21,15 +21,13 @@ import breeze.linalg.DenseMatrix
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
-  * Generic Consfusion Matrix Aggregator for any dimension.
-  * Thresholds must be applied to make a prediction prior to using this aggregator.
-  *
-  * @param labels List of possible label values
-  */
+ * Generic Consfusion Matrix Aggregator for any dimension.
+ * Thresholds must be applied to make a prediction prior to using this aggregator.
+ *
+ * @param labels List of possible label values
+ */
 final case class ConfusionMatrix(labels: Seq[Int])
-    extends Aggregator[Prediction[Int, Int],
-                       Map[(Int, Int), Long],
-                       DenseMatrix[Long]] {
+    extends Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], DenseMatrix[Long]] {
 
   def prepare(input: Prediction[Int, Int]): Map[(Int, Int), Long] =
     Map((input.predicted, input.actual) -> 1L)
@@ -39,7 +37,10 @@ final case class ConfusionMatrix(labels: Seq[Int])
 
   def present(m: Map[(Int, Int), Long]): DenseMatrix[Long] = {
     val mat = DenseMatrix.zeros[Long](labels.size, labels.size)
-    for (i <- labels; j <- labels) {
+    for {
+      i <- labels
+      j <- labels
+    } {
       mat(i, j) = m.getOrElse((i, j), 0L)
     }
     mat

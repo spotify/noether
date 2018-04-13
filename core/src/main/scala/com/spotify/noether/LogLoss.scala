@@ -20,10 +20,9 @@ package com.spotify.noether
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
-  * <a href="http://wiki.fast.ai/index.php/Log_Loss">LogLoss of the predictions.</a>
-  */
-case object LogLoss
-    extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
+ * <a href="http://wiki.fast.ai/index.php/Log_Loss">LogLoss of the predictions.</a>
+ */
+case object LogLoss extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
   def prepare(input: Prediction[Int, List[Double]]): (Double, Long) =
     (math.log(input.predicted(input.actual)), 1L)
 

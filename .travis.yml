@@ -17,8 +17,9 @@ script:
         clean \
         scalafmtSbtCheck scalafmtCheck test:scalafmtCheck \
         scalastyle test:scalastyle \
+        coverage \
         test \
-        coverage coverageReport coverageAggregate
+        coverageReport coverageAggregate
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" -delete

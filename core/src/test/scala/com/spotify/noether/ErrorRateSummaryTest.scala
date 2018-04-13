@@ -27,8 +27,9 @@ class ErrorRateSummaryTest extends AggregatorTest {
 
   it should "return correct scores" in {
     val data =
-      List((s(1), 1), (s(3), 1), (s(5), 5), (s(2), 3), (s(0), 0), (s(8), 1))
-        .map { case (scores, label) => Prediction(label, scores) }
+      List((s(1), 1), (s(3), 1), (s(5), 5), (s(2), 3), (s(0), 0), (s(8), 1)).map {
+        case (scores, label) => Prediction(label, scores)
+      }
 
     assert(run(ErrorRateSummary)(data) === 0.5)
   }

@@ -35,46 +35,45 @@ private[noether] object AreaUnderCurve {
       .sliding(2)
       .withPartial(false)
       .aggregate(0.0)(
-        seqop = (auc: Double, points: Seq[(Double, Double)]) =>
-          auc + trapezoid(points),
+        seqop = (auc: Double, points: Seq[(Double, Double)]) => auc + trapezoid(points),
         combop = _ + _
       )
   }
 }
 
 /**
-  * Which function to apply on the list of confusion matrices prior to the AUC calculation.
-  */
+ * Which function to apply on the list of confusion matrices prior to the AUC calculation.
+ */
 sealed trait AUCMetric
 
 /**
-  * <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">
-  *   Receiver operating characteristic Curve
-  * </a>
-  */
+ * <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">
+ *   Receiver operating characteristic Curve
+ * </a>
+ */
 case object ROC extends AUCMetric
 
 /**
-  * <a href="https://en.wikipedia.org/wiki/Precision_and_recall">
-  *   Precision Recall Curve
-  * </a>
-  */
+ * <a href="https://en.wikipedia.org/wiki/Precision_and_recall">
+ *   Precision Recall Curve
+ * </a>
+ */
 case object PR extends AUCMetric
 
 /**
-  * Compute the "Area Under the Curve" for a collection of predictions. Uses the Trapezoid method to
-  * compute the area.
-  *
-  * Internally a linspace is defined using the given number of [[samples]]. Each point in the
-  * linspace represents a threshold which is used to build a confusion matrix.
-  * The area is then defined on this list of confusion matrices.
-  *
-  * [[AUCMetric]] which is given to the aggregate selects the function to apply on
-  * the confusion matrix prior to the AUC calculation.
-  *
-  * @param metric  Which function to apply on the confusion matrix.
-  * @param samples Number of samples to use for the curve definition.
-  */
+ * Compute the "Area Under the Curve" for a collection of predictions. Uses the Trapezoid method to
+ * compute the area.
+ *
+ * Internally a linspace is defined using the given number of [[samples]]. Each point in the
+ * linspace represents a threshold which is used to build a confusion matrix.
+ * The area is then defined on this list of confusion matrices.
+ *
+ * [[AUCMetric]] which is given to the aggregate selects the function to apply on
+ * the confusion matrix prior to the AUC calculation.
+ *
+ * @param metric  Which function to apply on the confusion matrix.
+ * @param samples Number of samples to use for the curve definition.
+ */
 case class AUC(metric: AUCMetric, samples: Int = 100)
     extends Aggregator[Prediction[Boolean, Double], Curve, Double] {
 

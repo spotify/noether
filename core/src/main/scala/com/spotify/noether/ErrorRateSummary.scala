@@ -20,8 +20,8 @@ package com.spotify.noether
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
-  * Measurement of what percentage of values were predicted incorrectly.
-  */
+ * Measurement of what percentage of values were predicted incorrectly.
+ */
 case object ErrorRateSummary
     extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
 

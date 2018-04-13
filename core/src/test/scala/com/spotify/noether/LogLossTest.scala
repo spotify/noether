@@ -27,8 +27,9 @@ class LogLossTest extends AggregatorTest {
     0.until(classes).map(i => if (i == idx) score else 0.0).toList
 
   it should "return correct scores" in {
-    val data = List((s(0, 0.8), 0), (s(1, 0.6), 1), (s(2, 0.7), 2))
-      .map { case (scores, label) => Prediction(label, scores) }
+    val data = List((s(0, 0.8), 0), (s(1, 0.6), 1), (s(2, 0.7), 2)).map {
+      case (scores, label) => Prediction(label, scores)
+    }
 
     assert(run(LogLoss)(data) === 0.363548039673)
   }

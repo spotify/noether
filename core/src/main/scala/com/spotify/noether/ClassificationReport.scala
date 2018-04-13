@@ -19,15 +19,15 @@ package com.spotify.noether
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
-  * Classification Report
-  *
-  * @param mcc <a href="https://bit.ly/2Jw7vL3"> Matthews Correlation Coefficient </a>
-  * @param fscore <a href="https://en.wikipedia.org/wiki/F1_score"> f-score </a>
-  * @param precision <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Precision </a>
-  * @param recall <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Recall </a>
-  * @param accuracy <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision"> Accuracy </a>
-  * @param fpr <a href="https://en.wikipedia.org/wiki/False_positive_rate"> False Positive Rate </a>
-  */
+ * Classification Report
+ *
+ * @param mcc <a href="https://bit.ly/2Jw7vL3"> Matthews Correlation Coefficient </a>
+ * @param fscore <a href="https://en.wikipedia.org/wiki/F1_score"> f-score </a>
+ * @param precision <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Precision </a>
+ * @param recall <a href="https://en.wikipedia.org/wiki/Precision_and_recall"> Recall </a>
+ * @param accuracy <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision"> Accuracy </a>
+ * @param fpr <a href="https://en.wikipedia.org/wiki/False_positive_rate"> False Positive Rate </a>
+ */
 final case class Report(mcc: Double,
                         fscore: Double,
                         precision: Double,
@@ -36,17 +36,14 @@ final case class Report(mcc: Double,
                         fpr: Double)
 
 /**
-  * Generate a Classification Report for a collection of binary predictions.
-  * The output of this aggregator will be a [[Report]] object.
-  *
-  * @param threshold Threshold to apply to get the predictions.
-  * @param beta Beta parameter used in the f-score calculation.
-  */
-final case class ClassificationReport(threshold: Double = 0.5,
-                                      beta: Double = 1.0)
-    extends Aggregator[Prediction[Boolean, Double],
-                       Map[(Int, Int), Long],
-                       Report] {
+ * Generate a Classification Report for a collection of binary predictions.
+ * The output of this aggregator will be a [[Report]] object.
+ *
+ * @param threshold Threshold to apply to get the predictions.
+ * @param beta Beta parameter used in the f-score calculation.
+ */
+final case class ClassificationReport(threshold: Double = 0.5, beta: Double = 1.0)
+    extends Aggregator[Prediction[Boolean, Double], Map[(Int, Int), Long], Report] {
 
   private val aggregator = MultiClassificationReport(Seq(0, 1))
 
@@ -64,17 +61,15 @@ final case class ClassificationReport(threshold: Double = 0.5,
 }
 
 /**
-  * Generate a Classification Report for a collection of multiclass predictions. A report is
-  * generated for each class by treating the predictions as binary of either "class" or "not class".
-  * The output of this aggregator will be a map of classes and their [[Report]] objects.
-  *
-  * @param labels List of possible label values.
-  * @param beta Beta parameter used in the f-score calculation.
-  */
+ * Generate a Classification Report for a collection of multiclass predictions. A report is
+ * generated for each class by treating the predictions as binary of either "class" or "not class".
+ * The output of this aggregator will be a map of classes and their [[Report]] objects.
+ *
+ * @param labels List of possible label values.
+ * @param beta Beta parameter used in the f-score calculation.
+ */
 final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
-    extends Aggregator[Prediction[Int, Int],
-                       Map[(Int, Int), Long],
-                       Map[Int, Report]] {
+    extends Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], Map[Int, Report]] {
 
   private val aggregator = ConfusionMatrix(labels)
 
@@ -88,22 +83,10 @@ final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
   override def present(m: Map[(Int, Int), Long]): Map[Int, Report] = {
     val mat = m.withDefaultValue(0L)
     labels.foldLeft(Map.empty[Int, Report]) { (result, clazz) =>
-      val fp = mat
-        .filterKeys { case (p, a) => p == clazz && a != clazz }
-        .values
-        .sum
-        .toDouble
+      val fp = mat.filterKeys { case (p, a) => p == clazz && a != clazz }.values.sum.toDouble
       val tp = mat(clazz -> clazz).toDouble
-      val tn = mat
-        .filterKeys { case (p, a) => p != clazz && a != clazz }
-        .values
-        .sum
-        .toDouble
-      val fn = mat
-        .filterKeys { case (p, a) => p != clazz && a == clazz }
-        .values
-        .sum
-        .toDouble
+      val tn = mat.filterKeys { case (p, a) => p != clazz && a != clazz }.values.sum.toDouble
+      val fn = mat.filterKeys { case (p, a) => p != clazz && a == clazz }.values.sum.toDouble
 
       val mccDenom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
       val mcc = if (mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0

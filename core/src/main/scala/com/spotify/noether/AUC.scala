@@ -20,7 +20,7 @@ package com.spotify.noether
 import breeze.linalg._
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-private[noether] case class Curve(cm: List[Map[(Int, Int), Long]])
+case class Curve(cm: List[Map[(Int, Int), Long]])
 
 private[noether] object AreaUnderCurve {
   def trapezoid(points: Seq[(Double, Double)]): Double = {

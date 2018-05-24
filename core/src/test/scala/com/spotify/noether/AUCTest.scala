@@ -43,20 +43,25 @@ class AUCTest extends AggregatorTest {
 
   it should "return points of a PR Curve" in {
     val expected = List(
-      (0.0,1.0), (0.0,1.0), (0.25,1.0), (0.75,0.75), (0.75,0.6), (1.0,0.5714285714285714)
-    ).map{case(a, b) => MetricCurvePoint(a, b)}
+      (0.0, 1.0),
+      (0.0, 1.0),
+      (0.25, 1.0),
+      (0.75, 0.75),
+      (0.75, 0.6),
+      (1.0, 0.5714285714285714)
+    ).map { case (a, b) => MetricCurvePoint(a, b) }
     assert(run(Curve(PR, samples = 5))(data) == expected)
   }
 
   it should "return points of a ROC Curve" in {
     val expected = List(
-      (0.0,0.0),
-      (0.0,0.25),
-      (0.3333333333333333,0.75),
-      (0.6666666666666666,0.75),
-      (1.0,1.0),
-      (1.0,1.0)
-    ).map{case(a, b) => MetricCurvePoint(a, b)}
+      (0.0, 0.0),
+      (0.0, 0.25),
+      (0.3333333333333333, 0.75),
+      (0.6666666666666666, 0.75),
+      (1.0, 1.0),
+      (1.0, 1.0)
+    ).map { case (a, b) => MetricCurvePoint(a, b) }
     assert(run(Curve(ROC, samples = 5))(data) == expected)
   }
 }

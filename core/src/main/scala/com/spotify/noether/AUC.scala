@@ -75,7 +75,7 @@ case object PR extends AUCMetric
  * @param samples Number of samples to use for the curve definition.
  */
 case class Curve(metric: AUCMetric, samples: Int = 100)
-  extends Aggregator[Prediction[Boolean, Double], MetricCurve, List[MetricCurvePoint]] {
+    extends Aggregator[Prediction[Boolean, Double], MetricCurve, List[MetricCurvePoint]] {
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators =
@@ -123,7 +123,7 @@ case class Curve(metric: AUCMetric, samples: Int = 100)
  * @param samples Number of samples to use for the curve definition.
  */
 case class AUC(metric: AUCMetric, samples: Int = 100)
-  extends Aggregator[Prediction[Boolean, Double], MetricCurve, Double] {
+    extends Aggregator[Prediction[Boolean, Double], MetricCurve, Double] {
   private val curve = Curve(metric, samples)
   def prepare(input: Prediction[Boolean, Double]): MetricCurve = curve.prepare(input)
   def semigroup: Semigroup[MetricCurve] = curve.semigroup

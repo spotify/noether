@@ -40,6 +40,7 @@ val commonSettings = Seq(
   sonatypeProfileName := "com.spotify",
   licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
   homepage := Some(url("https://github.com/spotify/noether")),
+  fork in run := true,
   scmInfo := Some(
     ScmInfo(url("https://github.com/spotify/noether.git"),
             "scm:git:git@github.com:spotify/noether.git")),

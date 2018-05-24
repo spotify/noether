@@ -22,6 +22,8 @@ import com.twitter.algebird.{Aggregator, Semigroup}
 
 case class MetricCurve(cm: List[Map[(Int, Int), Long]]) extends Serializable
 
+case class MetricCurvePoints(points: List[MetricCurvePoint]) extends Serializable
+
 case class MetricCurvePoint(x: Double, y: Double) extends Serializable
 
 private[noether] object AreaUnderCurve {
@@ -31,8 +33,10 @@ private[noether] object AreaUnderCurve {
     (y.x - x.x) * (y.y + x.y) / 2.0
   }
 
-  def of(curve: List[MetricCurvePoint]): Double = {
-    curve.toIterator
+  def of(curve: MetricCurvePoints): Double = {
+    curve
+      .points
+      .toIterator
       .sliding(2)
       .withPartial(false)
       .aggregate(0.0)(
@@ -75,7 +79,7 @@ case object PR extends AUCMetric
  * @param samples Number of samples to use for the curve definition.
  */
 case class Curve(metric: AUCMetric, samples: Int = 100)
-    extends Aggregator[Prediction[Boolean, Double], MetricCurve, List[MetricCurvePoint]] {
+    extends Aggregator[Prediction[Boolean, Double], MetricCurve, MetricCurvePoints] {
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators =
@@ -92,7 +96,7 @@ case class Curve(metric: AUCMetric, samples: Int = 100)
     }
   }
 
-  def present(c: MetricCurve): List[MetricCurvePoint] = {
+  def present(c: MetricCurve): MetricCurvePoints = {
     val total = c.cm.map { matrix =>
       val scores = ClassificationReport().present(matrix)
       metric match {
@@ -101,10 +105,12 @@ case class Curve(metric: AUCMetric, samples: Int = 100)
       }
     }.reverse
 
-    metric match {
+    val points = metric match {
       case ROC => total ++ List(MetricCurvePoint(1.0, 1.0))
       case PR  => List(MetricCurvePoint(0.0, 1.0)) ++ total
     }
+
+    MetricCurvePoints(points)
   }
 }
 

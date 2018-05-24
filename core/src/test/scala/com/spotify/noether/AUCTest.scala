@@ -50,7 +50,7 @@ class AUCTest extends AggregatorTest {
       (0.75, 0.6),
       (1.0, 0.5714285714285714)
     ).map { case (a, b) => MetricCurvePoint(a, b) }
-    assert(run(Curve(PR, samples = 5))(data) == expected)
+    assert(run(Curve(PR, samples = 5))(data) == MetricCurvePoints(expected))
   }
 
   it should "return points of a ROC Curve" in {
@@ -62,6 +62,6 @@ class AUCTest extends AggregatorTest {
       (1.0, 1.0),
       (1.0, 1.0)
     ).map { case (a, b) => MetricCurvePoint(a, b) }
-    assert(run(Curve(ROC, samples = 5))(data) == expected)
+    assert(run(Curve(ROC, samples = 5))(data) == MetricCurvePoints(expected))
   }
 }

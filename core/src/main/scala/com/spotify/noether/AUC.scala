@@ -34,9 +34,7 @@ private[noether] object AreaUnderCurve {
   }
 
   def of(curve: MetricCurvePoints): Double = {
-    curve
-      .points
-      .toIterator
+    curve.points.toIterator
       .sliding(2)
       .withPartial(false)
       .aggregate(0.0)(

@@ -20,9 +20,9 @@ package com.spotify.noether
 import breeze.linalg._
 import com.twitter.algebird.{Aggregator, Semigroup}
 
-case class MetricCurve(cm: List[Map[(Int, Int), Long]]) extends Serializable
+case class MetricCurve(cm: Array[Map[(Int, Int), Long]]) extends Serializable
 
-case class MetricCurvePoints(points: List[MetricCurvePoint]) extends Serializable
+case class MetricCurvePoints(points: Array[MetricCurvePoint]) extends Serializable
 
 case class MetricCurvePoint(x: Double, y: Double) extends Serializable
 
@@ -81,7 +81,7 @@ case class Curve(metric: AUCMetric, samples: Int = 100)
 
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators =
-    thresholds.data.map(ClassificationReport(_)).toList
+    thresholds.data.map(ClassificationReport(_)).toArray
 
   def prepare(input: Prediction[Boolean, Double]): MetricCurve =
     MetricCurve(aggregators.map(_.prepare(input)))
@@ -104,8 +104,8 @@ case class Curve(metric: AUCMetric, samples: Int = 100)
     }.reverse
 
     val points = metric match {
-      case ROC => total ++ List(MetricCurvePoint(1.0, 1.0))
-      case PR  => List(MetricCurvePoint(0.0, 1.0)) ++ total
+      case ROC => total ++ Array(MetricCurvePoint(1.0, 1.0))
+      case PR  => Array(MetricCurvePoint(0.0, 1.0)) ++ total
     }
 
     MetricCurvePoints(points)

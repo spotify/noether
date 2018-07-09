@@ -31,9 +31,11 @@ val commonSettings = Seq(
   scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc) := Seq("-source", "1.8"),
-  publishTo := Some(
-    if (isSnapshot.value) Opts.resolver.sonatypeSnapshots
-    else Opts.resolver.sonatypeStaging),
+  publishTo := Some(if (isSnapshot.value) {
+    Opts.resolver.sonatypeSnapshots
+  } else {
+    Opts.resolver.sonatypeStaging
+  }),
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,
@@ -68,9 +70,11 @@ lazy val root: Project = project
   .settings(noPublishSettings)
   .aggregate(noetherCore, noetherExamples)
 
-lazy val noetherCore: Project = Project("noether-core", file("core"))
+lazy val noetherCore: Project = project
+  .in(file("core"))
   .settings(commonSettings)
   .settings(
+    name := "noether-core",
     moduleName := "noether-core",
     description := "Machine Learning Aggregators",
     libraryDependencies ++= Seq(
@@ -80,9 +84,11 @@ lazy val noetherCore: Project = Project("noether-core", file("core"))
     )
   )
 
-lazy val noetherExamples: Project = Project("noether-examples", file("examples"))
+lazy val noetherExamples: Project = project
+  .in(file("examples"))
   .settings(commonSettings)
   .settings(
+    name := "noether-examples",
     moduleName := "noether-examples",
     description := "Noether Examples"
   )

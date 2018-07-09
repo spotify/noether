@@ -10,6 +10,10 @@ matrix:
 
     - scala: 2.12.6
       jdk: oraclejdk8
+      script: sbt mimaReportBinaryIssues
+
+    - scala: 2.12.6
+      jdk: oraclejdk8
       script: sbt coverage "++$TRAVIS_SCALA_VERSION test" coverageReport coverageAggregate
       after_success:
         - bash <(curl -s https://codecov.io/bash)
@@ -17,6 +21,11 @@ matrix:
     - scala: 2.11.12
       jdk: oraclejdk8
       script: sbt "++$TRAVIS_SCALA_VERSION test"
+
+  allow_failures:
+    - scala: 2.12.6
+      jdk: oraclejdk8
+      script: sbt mimaReportBinaryIssues
 
 cache:
   directories:

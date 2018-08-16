@@ -20,6 +20,7 @@ import sbt.Keys._
 val breezeVersion = "1.0-RC2"
 val algebirdVersion = "0.13.4"
 val scalaTestVersion = "3.0.5"
+val protobufVersion = "3.3.1"
 
 val commonSettings = Seq(
   organization := "com.spotify",
@@ -58,7 +59,15 @@ val commonSettings = Seq(
     Developer(id = "regadas",
               name = "Filipe Regadas",
               email = "filiperegadas@gmail.com",
-              url = url("https://twitter.com/regadas"))
+              url = url("https://twitter.com/regadas")),
+    Developer(id = "regadas",
+      name = "Filipe Regadas",
+      email = "filiperegadas@gmail.com",
+      url = url("https://twitter.com/regadas")),
+    Developer(id="andrewsmartin",
+      name="Andrew Martin",
+      email="andrewsmartin.mg@gmail.com",
+      url=url("https://twitter.com/andrew_martin92")),
   )
 )
 
@@ -98,6 +107,34 @@ lazy val noetherExamples: Project = project
     moduleName := "noether-examples",
     description := "Noether Examples"
   )
+  .dependsOn(noetherCore)
+
+lazy val noetherTFX: Project = project
+  .in(file("tfx"))
+  .settings(commonSettings)
+  .settings(
+    name := "noether-tfx",
+    moduleName := "noether-tfx",
+    description := "TFX adapters",
+    libraryDependencies ++= Seq(
+      "org.scalanlp" %% "breeze" % breezeVersion,
+      "com.twitter" %% "algebird-core" % algebirdVersion,
+      "org.scalatest" %% "scalatest" % scalaTestVersion,
+    ),
+      version in ProtobufConfig := protobufVersion,
+      protobufRunProtoc in ProtobufConfig := (args =>
+        // protoc-jar does not include 3.3.1 binary
+        com.github.os72.protocjar.Protoc.runProtoc("-v3.3.0" +: args.toArray)
+        ),
+      // Avro and Protobuf files are compiled to src_managed/main/compiled_{avro,protobuf}
+      // Exclude their parent to avoid confusing IntelliJ
+      sourceDirectories in Compile := (sourceDirectories in Compile).value
+        .filterNot(_.getPath.endsWith("/src_managed/main")),
+      managedSourceDirectories in Compile := (managedSourceDirectories in Compile).value
+        .filterNot(_.getPath.endsWith("/src_managed/main")),
+      sources in doc in Compile := List(),  // suppress warnings
+      compileOrder := CompileOrder.JavaThenScala
+  ).enablePlugins(ProtobufPlugin)
   .dependsOn(noetherCore)
 
 // sampled from https://tpolecat.github.io/2017/04/25/scalac-flags.html

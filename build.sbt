@@ -60,10 +60,6 @@ val commonSettings = Def.settings(
               email = "fallon@spotify.com",
               url = url("https://twitter.com/fallonfofallon")),
     Developer(id = "regadas",
-              name = "Filipe Regadas",
-              email = "filiperegadas@gmail.com",
-              url = url("https://twitter.com/regadas")),
-    Developer(id = "regadas",
       name = "Filipe Regadas",
       email = "filiperegadas@gmail.com",
       url = url("https://twitter.com/regadas")),
@@ -82,7 +78,8 @@ lazy val root: Project = project
     noetherCore,
     noetherExamples,
     noetherBenchmark,
-    noetherDocs
+    noetherDocs,
+    noetherTFX
   )
 
 lazy val noetherDocs: Project = project
@@ -152,20 +149,21 @@ lazy val noetherTFX: Project = project
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion,
       "org.scalatest" %% "scalatest" % scalaTestVersion,
+      "com.google.protobuf" % "protobuf-java" % protobufVersion % ProtobufConfig.name
     ),
-      version in ProtobufConfig := protobufVersion,
-      protobufRunProtoc in ProtobufConfig := (args =>
-        // protoc-jar does not include 3.3.1 binary
-        com.github.os72.protocjar.Protoc.runProtoc("-v3.3.0" +: args.toArray)
-        ),
-      // Avro and Protobuf files are compiled to src_managed/main/compiled_{avro,protobuf}
-      // Exclude their parent to avoid confusing IntelliJ
-      sourceDirectories in Compile := (sourceDirectories in Compile).value
-        .filterNot(_.getPath.endsWith("/src_managed/main")),
-      managedSourceDirectories in Compile := (managedSourceDirectories in Compile).value
-        .filterNot(_.getPath.endsWith("/src_managed/main")),
-      sources in doc in Compile := List(),  // suppress warnings
-      compileOrder := CompileOrder.JavaThenScala
+    version in ProtobufConfig := protobufVersion,
+    protobufRunProtoc in ProtobufConfig := (args =>
+      // protoc-jar does not include 3.3.1 binary
+      com.github.os72.protocjar.Protoc.runProtoc("-v3.3.0" +: args.toArray)
+      ),
+    // Avro and Protobuf files are compiled to src_managed/main/compiled_{avro,protobuf}
+    // Exclude their parent to avoid confusing IntelliJ
+    sourceDirectories in Compile := (sourceDirectories in Compile).value
+      .filterNot(_.getPath.endsWith("/src_managed/main")),
+    managedSourceDirectories in Compile := (managedSourceDirectories in Compile).value
+      .filterNot(_.getPath.endsWith("/src_managed/main")),
+    sources in doc in Compile := List(),  // suppress warnings
+    compileOrder := CompileOrder.JavaThenScala
   ).enablePlugins(ProtobufPlugin)
   .dependsOn(noetherCore)
 

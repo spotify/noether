@@ -18,11 +18,16 @@
 package com.spotify.noether.tfx
 
 import com.spotify.noether.tfx.Tfma.TfmaConversionOps
-import com.spotify.noether.{AUC, BinaryConfusionMatrix, MetricCurve}
+import com.spotify.noether._
 
 import scala.language.implicitConversions
 
 trait TfmaImplicits {
+  implicit def confusionMatrixConversion(agg: ConfusionMatrix)(
+    implicit c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix])
+    : TfmaConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
+    TfmaConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix](agg, c)
+
   implicit def binaryConfusionMatrixConversion(agg: BinaryConfusionMatrix)(
     implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix])
     : TfmaConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
@@ -31,4 +36,9 @@ trait TfmaImplicits {
   implicit def aucConversion(agg: AUC)(implicit c: TfmaConverter[BinaryPred, MetricCurve, AUC])
     : TfmaConversionOps[BinaryPred, MetricCurve, AUC] =
     TfmaConversionOps[BinaryPred, MetricCurve, AUC](agg, c)
+
+  implicit def errorRateSummaryConversion(agg: ErrorRateSummary.type)(
+    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type])
+    : TfmaConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
+    TfmaConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type](agg, c)
 }

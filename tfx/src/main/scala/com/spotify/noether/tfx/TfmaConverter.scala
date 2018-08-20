@@ -17,8 +17,9 @@
 
 package com.spotify.noether.tfx
 
+import breeze.linalg.DenseMatrix
 import com.google.protobuf.DoubleValue
-import com.spotify.noether._
+import com.spotify.noether.{ErrorRateSummary, _}
 import com.twitter.algebird.Aggregator
 import tensorflow_model_analysis.MetricsForSliceOuterClass.ConfusionMatrixAtThresholds._
 import tensorflow_model_analysis.MetricsForSliceOuterClass._
@@ -29,33 +30,78 @@ trait TfmaConverter[A, B, T <: Aggregator[A, B, _]] {
 
 object TfmaConverter {
 
+  private def denseMatrixToMetric(threshold: Option[Double] = None)(
+    matrix: DenseMatrix[Long]): MetricsForSlice = {
+    val tp = matrix.valueAt(1, 1).toDouble
+    val tn = matrix.valueAt(0, 0).toDouble
+    val fp = matrix.valueAt(1, 0).toDouble
+    val fn = matrix.valueAt(0, 1).toDouble
+
+    val cmBuilder = ConfusionMatrixAtThreshold
+      .newBuilder()
+      .setFalseNegatives(fn)
+      .setFalsePositives(fp)
+      .setTrueNegatives(tn)
+      .setTruePositives(tp)
+      .setPrecision(tp / (tp + fp))
+      .setRecall(tp / (tp + fn))
+
+    threshold.foreach(cmBuilder.setThreshold(_))
+
+    MetricsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .putMetrics(
+        "Noether_ConfusionMatrix",
+        MetricValue
+          .newBuilder()
+          .setConfusionMatrixAtThresholds(
+            ConfusionMatrixAtThresholds
+              .newBuilder()
+              .addMatrices(cmBuilder.build())
+              .build())
+          .build()
+      )
+      .build()
+  }
+
+  implicit val errorRateSummaryConverter
+    : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
+    new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] {
+      override def convertToTfmaProto(underlying: ErrorRateSummary.type)
+        : Aggregator[Prediction[Int, List[Double]], (Double, Long), MetricsForSlice] =
+        ErrorRateSummary.andThenPresent { ers =>
+          MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics("Noether_ErrorRateSummary",
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(
+                            DoubleValue
+                              .newBuilder()
+                              .setValue(ers)
+                              .build())
+                          .build())
+            .build()
+        }
+    }
+
   implicit val binaryConfusionMatrixConverter
     : TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
     new TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] {
       override def convertToTfmaProto(underlying: BinaryConfusionMatrix)
         : Aggregator[BinaryPred, Map[(Int, Int), Long], MetricsForSlice] =
         underlying
-          .andThenPresent { matrix =>
-            MetricsForSlice
-              .newBuilder()
-              .setSliceKey(SliceKey.getDefaultInstance)
-              .putMetrics(
-                "Noether_BinaryConfusionMatrix",
-                MetricValue
-                  .newBuilder()
-                  .setConfusionMatrixAtThresholds(
-                    newBuilder()
-                      .setMatrices(0,
-                                   ConfusionMatrixAtThreshold
-                                     .newBuilder()
-                                     .setThreshold(underlying.threshold)
-                                     //                  .setFalseNegatives(matrix)))
-                                     .build())
-                      .build())
-                  .build()
-              )
-              .build()
-          }
+          .andThenPresent(denseMatrixToMetric(Some(underlying.threshold)))
+    }
+
+  implicit val confusionMatrixConverter
+    : TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
+    new TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] {
+      override def convertToTfmaProto(underlying: ConfusionMatrix)
+        : Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], MetricsForSlice] =
+        underlying.andThenPresent(denseMatrixToMetric())
     }
 
   implicit val aucConverter: TfmaConverter[BinaryPred, MetricCurve, AUC] =

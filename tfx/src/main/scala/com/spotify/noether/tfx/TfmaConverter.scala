@@ -93,7 +93,7 @@ object TfmaConversionOps {
   : TfmaConversionOps[Prediction[Boolean, Double], Map[(Int, Int), Long], BinaryConfusionMatrix] =
     TfmaConversionOps[Prediction[Boolean, Double], Map[(Int, Int), Long], BinaryConfusionMatrix](agg, c)
 
-  implicit def aucConverstion(agg: AUC)
+  implicit def aucConversion(agg: AUC)
                              (implicit c: TfmaConverter[Prediction[Boolean, Double],
                                                         MetricCurve,
                                                         AUC])

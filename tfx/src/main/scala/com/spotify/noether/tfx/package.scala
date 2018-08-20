@@ -15,16 +15,8 @@
  * under the License.
  */
 
-package com.spotify.noether.tfx
+package com.spotify.noether
 
-import com.spotify.noether.{AUC, BinaryConfusionMatrix, ROC}
-import org.scalatest.{FlatSpec, Matchers}
-
-class TfmaConverterTest extends FlatSpec with Matchers {
-
-  "Stuff" should "work" in {
-    val binAgg = BinaryConfusionMatrix().asTfmaProto
-    val aucAgg = AUC(ROC).asTfmaProto
-  }
-
+package object tfx extends TfmaImplicits {
+  type BinaryPred = Prediction[Boolean, Double]
 }

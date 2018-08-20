@@ -60,13 +60,13 @@ val commonSettings = Def.settings(
               email = "fallon@spotify.com",
               url = url("https://twitter.com/fallonfofallon")),
     Developer(id = "regadas",
-      name = "Filipe Regadas",
-      email = "filiperegadas@gmail.com",
-      url = url("https://twitter.com/regadas")),
+              name = "Filipe Regadas",
+              email = "filiperegadas@gmail.com",
+              url = url("https://twitter.com/regadas")),
     Developer(id="andrewsmartin",
-      name="Andrew Martin",
-      email="andrewsmartin.mg@gmail.com",
-      url=url("https://twitter.com/andrew_martin92")),
+              name="Andrew Martin",
+              email="andrewsmartin.mg@gmail.com",
+              url=url("https://twitter.com/andrew_martin92"))
   )
 )
 
@@ -154,17 +154,17 @@ lazy val noetherTFX: Project = project
     version in ProtobufConfig := protobufVersion,
     protobufRunProtoc in ProtobufConfig := (args =>
       // protoc-jar does not include 3.3.1 binary
-      com.github.os72.protocjar.Protoc.runProtoc("-v3.3.0" +: args.toArray)
-      ),
+      com.github.os72.protocjar.Protoc.runProtoc("-v3.3.0" +: args.toArray)),
     // Avro and Protobuf files are compiled to src_managed/main/compiled_{avro,protobuf}
     // Exclude their parent to avoid confusing IntelliJ
     sourceDirectories in Compile := (sourceDirectories in Compile).value
       .filterNot(_.getPath.endsWith("/src_managed/main")),
     managedSourceDirectories in Compile := (managedSourceDirectories in Compile).value
       .filterNot(_.getPath.endsWith("/src_managed/main")),
-    sources in doc in Compile := List(),  // suppress warnings
+    sources in doc in Compile := List(), // suppress warnings
     compileOrder := CompileOrder.JavaThenScala
-  ).enablePlugins(ProtobufPlugin)
+  )
+  .enablePlugins(ProtobufPlugin)
   .dependsOn(noetherCore)
 
 // sampled from https://tpolecat.github.io/2017/04/25/scalac-flags.html

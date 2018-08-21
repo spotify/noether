@@ -51,4 +51,5 @@ trait TfmaImplicits {
     implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]])
     : ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]](agg, c)
+
 }

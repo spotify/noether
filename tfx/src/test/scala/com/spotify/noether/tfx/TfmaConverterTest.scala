@@ -18,6 +18,7 @@
 package com.spotify.noether.tfx
 
 import com.spotify.noether._
+import com.twitter.algebird.MultiAggregator
 import org.scalactic.TolerantNumerics
 import org.scalatest.{FlatSpec, Matchers}
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice

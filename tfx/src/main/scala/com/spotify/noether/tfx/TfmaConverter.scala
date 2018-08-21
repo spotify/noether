@@ -20,12 +20,37 @@ package com.spotify.noether.tfx
 import breeze.linalg.DenseMatrix
 import com.google.protobuf.DoubleValue
 import com.spotify.noether.{ErrorRateSummary, _}
-import com.twitter.algebird.Aggregator
+import com.twitter.algebird.{Aggregator, MultiAggregator}
 import tensorflow_model_analysis.MetricsForSliceOuterClass.ConfusionMatrixAtThresholds._
 import tensorflow_model_analysis.MetricsForSliceOuterClass._
 
 trait TfmaConverter[A, B, T <: Aggregator[A, B, _]] {
   def convertToTfmaProto(underlying: T): Aggregator[A, B, MetricsForSlice]
+
+  def compose[B_, T_ <: Aggregator[A, B_, _]](
+    implicit c: TfmaConverter[A, B_, T_]): TfmaConverter[A, (B, B_), (T, T_)] = {
+    val outer = this
+    new TfmaConverter[A, (B, B_), (T, T_)] {
+      override def convertToTfmaProto(
+        underlying: (T, T_)): Aggregator[A, (B, B_), MetricsForSlice] = underlying match {
+        case (t1, t2) =>
+          val a1 = outer.convertToTfmaProto(t1)
+          val a2 = c.convertToTfmaProto(t2)
+          val joined = a1.join(a2)
+          joined.andThenPresent {
+            case (proto1, proto2) =>
+              val allMetrics = proto1.getMetricsMap
+              allMetrics.putAll(proto2.getMetricsMap)
+              MetricsForSlice
+                .newBuilder()
+                .setSliceKey(SliceKey.getDefaultInstance)
+                .putAllMetrics(allMetrics)
+                .build()
+          }
+      }
+    }
+  }
+
 }
 
 object TfmaConverter {
@@ -163,4 +188,14 @@ object TfmaConverter {
             .build()
         }
     }
+
+  implicit def multiAggConverter[A,
+                                 B1,
+                                 B2,
+                                 C1,
+                                 C2,
+                                 T1 <: Aggregator[A, B1, C1],
+                                 T2 <: Aggregator[A, B2, C2]](
+    implicit e1: TfmaConverter[A, B1, T1],
+    e2: TfmaConverter[A, B2, T2]): TfmaConverter[A, (B1, B2), (T1, T2)] = e1.compose(e2)
 }

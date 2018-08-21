@@ -113,4 +113,21 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(actualROC === 0.833)
     assert(actualPR === 0.896)
   }
+
+  it should "work with LogLoss" in {
+    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
+    val classes = 10
+
+    def s(idx: Int, score: Double): List[Double] =
+      0.until(classes).map(i => if (i == idx) score else 0.0).toList
+
+    val data = List((s(0, 0.8), 0), (s(1, 0.6), 1), (s(2, 0.7), 2)).map {
+      case (scores, label) => Prediction(label, scores)
+    }
+
+    val logLossProto: MetricsForSlice = LogLoss.asTfmaProto(data)
+
+    val logLoss = logLossProto.getMetricsMap.get("Noether_LogLoss").getDoubleValue.getValue
+    assert(logLoss === 0.363548039673)
+  }
 }

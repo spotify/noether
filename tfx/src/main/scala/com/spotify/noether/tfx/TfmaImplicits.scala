@@ -17,7 +17,7 @@
 
 package com.spotify.noether.tfx
 
-import com.spotify.noether.tfx.Tfma.TfmaConversionOps
+import com.spotify.noether.tfx.Tfma.ConversionOps
 import com.spotify.noether._
 
 import scala.language.implicitConversions
@@ -25,20 +25,20 @@ import scala.language.implicitConversions
 trait TfmaImplicits {
   implicit def confusionMatrixConversion(agg: ConfusionMatrix)(
     implicit c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix])
-    : TfmaConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
-    TfmaConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix](agg, c)
+    : ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
+    ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix](agg, c)
 
   implicit def binaryConfusionMatrixConversion(agg: BinaryConfusionMatrix)(
     implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix])
-    : TfmaConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
-    TfmaConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix](agg, c)
+    : ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
+    ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix](agg, c)
 
   implicit def aucConversion(agg: AUC)(implicit c: TfmaConverter[BinaryPred, MetricCurve, AUC])
-    : TfmaConversionOps[BinaryPred, MetricCurve, AUC] =
-    TfmaConversionOps[BinaryPred, MetricCurve, AUC](agg, c)
+    : ConversionOps[BinaryPred, MetricCurve, AUC] =
+    ConversionOps[BinaryPred, MetricCurve, AUC](agg, c)
 
   implicit def errorRateSummaryConversion(agg: ErrorRateSummary.type)(
     implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type])
-    : TfmaConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
-    TfmaConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type](agg, c)
+    : ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
+    ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type](agg, c)
 }

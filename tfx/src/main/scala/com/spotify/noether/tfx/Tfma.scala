@@ -21,17 +21,17 @@ import com.twitter.algebird.Aggregator
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 
 object Tfma {
-  trait TfmaConversionOps[A, B, T <: Aggregator[A, B, _]] {
+  trait ConversionOps[A, B, T <: Aggregator[A, B, _]] {
     val self: T
     val converter: TfmaConverter[A, B, T]
     def asTfmaProto: Aggregator[A, B, MetricsForSlice] = converter.convertToTfmaProto(self)
   }
 
-  object TfmaConversionOps {
+  object ConversionOps {
     def apply[A, B, T <: Aggregator[A, B, _]](
       instance: T,
-      tfmaConverter: TfmaConverter[A, B, T]): TfmaConversionOps[A, B, T] =
-      new TfmaConversionOps[A, B, T] {
+      tfmaConverter: TfmaConverter[A, B, T]): ConversionOps[A, B, T] =
+      new ConversionOps[A, B, T] {
         override val self: T = instance
         override val converter: TfmaConverter[A, B, T] = tfmaConverter
       }

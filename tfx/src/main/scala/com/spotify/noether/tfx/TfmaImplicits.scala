@@ -41,4 +41,9 @@ trait TfmaImplicits {
     implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type])
     : ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
     ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type](agg, c)
+
+  implicit def logLossConversion(agg: LogLoss.type)(
+    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type])
+    : ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
+    ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type](agg, c)
 }

@@ -125,4 +125,23 @@ object TfmaConverter {
               .build()
           }
     }
+
+  implicit val logLossConverter
+    : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
+    new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] {
+      override def convertToTfmaProto(underlying: LogLoss.type)
+        : Aggregator[Prediction[Int, List[Double]], (Double, Long), MetricsForSlice] =
+        underlying.andThenPresent { logLoss =>
+          val metricName = "Noether_LogLoss"
+          MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(logLoss))
+                          .build())
+            .build()
+        }
+    }
 }

@@ -24,13 +24,7 @@ import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 
 class TfmaConverterTest extends FlatSpec with Matchers {
 
-  "Stuff" should "work" in {
-    val binAgg = BinaryConfusionMatrix().asTfmaProto
-
-    val aucAgg = AUC(ROC).asTfmaProto
-  }
-
-  "ConfusionMatrix converter" should "work" in {
+  "TfmaConverter" should "work with ConfusionMatrix" in {
     val data = List(
       (0, 0),
       (0, 1),
@@ -55,7 +49,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(cm.getTruePositives === 3L)
   }
 
-  "BinaryConfusionMatrix converter" should "work" in {
+  it should "work with BinaryConfusionMatrix" in {
     val data = List(
       (false, 0.1),
       (false, 0.6),
@@ -81,7 +75,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(cm.getTrueNegatives === 2L)
   }
 
-  "Error rate summary" should "work" in {
+  it should "work with ErrorRateSummary" in {
     implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
     val classes = 10
     def s(idx: Int): List[Double] = 0.until(classes).map(i => if (i == idx) 1.0 else 0.0).toList
@@ -96,5 +90,27 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     val ersV =
       ersProto.getMetricsMap.get("Noether_ErrorRateSummary").getDoubleValue.getValue
     assert(ersV === 0.5)
+  }
+
+  it should "work with AUC" in {
+    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
+    val data = List(
+      (false, 0.1),
+      (false, 0.6),
+      (false, 0.2),
+      (true, 0.2),
+      (true, 0.8),
+      (true, 0.7),
+      (true, 0.6)
+    ).map { case (pred, s) => Prediction(pred, s) }
+
+    val aucROCProto = AUC(ROC).asTfmaProto(data)
+    val aucPRProto = AUC(PR).asTfmaProto(data)
+
+    val actualROC = aucROCProto.getMetricsMap.get("Noether_AUC:ROC").getDoubleValue.getValue
+    val actualPR = aucPRProto.getMetricsMap.get("Noether_AUC:PR").getDoubleValue.getValue
+
+    assert(actualROC === 0.833)
+    assert(actualPR === 0.896)
   }
 }

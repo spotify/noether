@@ -136,7 +136,7 @@ lazy val noetherTFX: Project = project
     compileOrder := CompileOrder.JavaThenScala
   )
   .enablePlugins(ProtobufPlugin)
-  .dependsOn(noetherCore)
+  .dependsOn(noetherCore % "test->test;compile->compile")
 
 // sampled from https://tpolecat.github.io/2017/04/25/scalac-flags.html
 lazy val commonScalacOptions = Seq(

@@ -144,4 +144,23 @@ object TfmaConverter {
             .build()
         }
     }
+
+  implicit def meanAvgPrecisionConverter[T]
+    : TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
+    new TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] {
+      override def convertToTfmaProto(underlying: MeanAveragePrecision[T])
+        : Aggregator[RankingPrediction[T], (Double, Long), MetricsForSlice] =
+        underlying.andThenPresent { meanAvgPrecision =>
+          val metricName = "Noether_MeanAvgPrecision"
+          MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(meanAvgPrecision))
+                          .build())
+            .build()
+        }
+    }
 }

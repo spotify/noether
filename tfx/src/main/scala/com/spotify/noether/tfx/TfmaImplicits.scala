@@ -46,4 +46,9 @@ trait TfmaImplicits {
     implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type])
     : ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
     ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type](agg, c)
+
+  implicit def meanAvgPrecisionConversion[T](agg: MeanAveragePrecision[T])(
+    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]])
+    : ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
+    ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]](agg, c)
 }

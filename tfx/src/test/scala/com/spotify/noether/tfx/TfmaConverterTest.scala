@@ -24,6 +24,8 @@ import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 
 class TfmaConverterTest extends FlatSpec with Matchers {
 
+  implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
+
   "TfmaConverter" should "work with ConfusionMatrix" in {
     val data = List(
       (0, 0),
@@ -43,10 +45,10 @@ class TfmaConverterTest extends FlatSpec with Matchers {
       .getConfusionMatrixAtThresholds
       .getMatrices(0)
 
-    assert(cm.getFalseNegatives === 1L)
-    assert(cm.getFalsePositives === 1L)
-    assert(cm.getTrueNegatives === 2L)
-    assert(cm.getTruePositives === 3L)
+    assert(cm.getFalseNegatives.toLong === 1L)
+    assert(cm.getFalsePositives.toLong === 1L)
+    assert(cm.getTrueNegatives.toLong === 2L)
+    assert(cm.getTruePositives.toLong === 3L)
   }
 
   it should "work with BinaryConfusionMatrix" in {
@@ -69,14 +71,13 @@ class TfmaConverterTest extends FlatSpec with Matchers {
       .getMatrices(0)
 
     assert(cm.getThreshold === 0.5)
-    assert(cm.getTruePositives === 3L)
-    assert(cm.getFalseNegatives === 1L)
-    assert(cm.getFalsePositives === 1L)
-    assert(cm.getTrueNegatives === 2L)
+    assert(cm.getTruePositives.toLong === 3L)
+    assert(cm.getFalseNegatives.toLong === 1L)
+    assert(cm.getFalsePositives.toLong === 1L)
+    assert(cm.getTrueNegatives.toLong === 2L)
   }
 
   it should "work with ErrorRateSummary" in {
-    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
     val classes = 10
     def s(idx: Int): List[Double] = 0.until(classes).map(i => if (i == idx) 1.0 else 0.0).toList
 
@@ -93,7 +94,6 @@ class TfmaConverterTest extends FlatSpec with Matchers {
   }
 
   it should "work with AUC" in {
-    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
     val data = List(
       (false, 0.1),
       (false, 0.6),
@@ -115,7 +115,6 @@ class TfmaConverterTest extends FlatSpec with Matchers {
   }
 
   it should "work with LogLoss" in {
-    implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
     val classes = 10
 
     def s(idx: Int, score: Double): List[Double] =
@@ -130,4 +129,15 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     val logLoss = logLossProto.getMetricsMap.get("Noether_LogLoss").getDoubleValue.getValue
     assert(logLoss === 0.363548039673)
   }
+
+  it should "work with MeanAveragePrecision" in {
+    import RankingData._
+    val proto = MeanAveragePrecision[Int]().asTfmaProto(rankingData)
+    val meanAvgPrecision = proto.getMetricsMap
+      .get("Noether_MeanAvgPrecision")
+      .getDoubleValue
+      .getValue
+    assert(meanAvgPrecision === 0.355026)
+  }
+
 }

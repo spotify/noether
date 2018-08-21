@@ -163,4 +163,24 @@ object TfmaConverter {
             .build()
         }
     }
+
+  implicit def ndcgAtKConverter[T]
+    : TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
+    new TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] {
+      override def convertToTfmaProto(
+        underlying: NdcgAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), MetricsForSlice] =
+        underlying.andThenPresent { ndcgAtK =>
+          val metricName = "Noether_NdcgAtK"
+          MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(ndcgAtK))
+                          .build())
+            .build()
+
+        }
+    }
 }

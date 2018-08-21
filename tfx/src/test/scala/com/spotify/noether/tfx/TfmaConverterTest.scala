@@ -157,4 +157,25 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(getNdcgAtK(10) === 0.487913)
     assert(getNdcgAtK(15) === getNdcgAtK(10))
   }
+
+  it should "work with PrecisionAtK" in {
+    import RankingData._
+    implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
+
+    def getPrecisionAtK(v: Int): Double =
+      PrecisionAtK[Int](v)
+        .asTfmaProto(rankingData)
+        .getMetricsMap
+        .get("Noether_PrecisionAtK")
+        .getDoubleValue
+        .getValue
+
+    assert(getPrecisionAtK(1) === 1.0 / 3)
+    assert(getPrecisionAtK(2) === 1.0 / 3)
+    assert(getPrecisionAtK(3) === 1.0 / 3)
+    assert(getPrecisionAtK(4) === 0.75 / 3)
+    assert(getPrecisionAtK(5) === 0.8 / 3)
+    assert(getPrecisionAtK(10) === 0.8 / 3)
+    assert(getPrecisionAtK(15) === 8.0 / 45)
+  }
 }

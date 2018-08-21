@@ -180,7 +180,25 @@ object TfmaConverter {
                           .setDoubleValue(DoubleValue.newBuilder().setValue(ndcgAtK))
                           .build())
             .build()
+        }
+    }
 
+  implicit def precisionAtK[T]
+    : TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
+    new TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] {
+      override def convertToTfmaProto(underlying: PrecisionAtK[T])
+        : Aggregator[RankingPrediction[T], (Double, Long), MetricsForSlice] =
+        underlying.andThenPresent { precisionAtK =>
+          val metricName = "Noether_PrecisionAtK"
+          MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(precisionAtK))
+                          .build())
+            .build()
         }
     }
 }

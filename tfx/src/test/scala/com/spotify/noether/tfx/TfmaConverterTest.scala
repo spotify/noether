@@ -18,7 +18,7 @@
 package com.spotify.noether.tfx
 
 import com.spotify.noether._
-import org.scalactic.TolerantNumerics
+import org.scalactic.{Equality, TolerantNumerics}
 import org.scalatest.{FlatSpec, Matchers}
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 
@@ -140,4 +140,21 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(meanAvgPrecision === 0.355026)
   }
 
+  it should "work with NdcgAtK" in {
+    import RankingData._
+    implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
+
+    def getNdcgAtK(v: Int): Double =
+      NdcgAtK[Int](v)
+        .asTfmaProto(rankingData)
+        .getMetricsMap
+        .get("Noether_NdcgAtK")
+        .getDoubleValue
+        .getValue
+
+    assert(getNdcgAtK(3) === 1.0 / 3)
+    assert(getNdcgAtK(5) === 0.328788)
+    assert(getNdcgAtK(10) === 0.487913)
+    assert(getNdcgAtK(15) === getNdcgAtK(10))
+  }
 }

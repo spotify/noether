@@ -25,13 +25,226 @@ import tensorflow_model_analysis.MetricsForSliceOuterClass.ConfusionMatrixAtThre
 import tensorflow_model_analysis.MetricsForSliceOuterClass._
 
 trait TfmaConverter[A, B, T <: Aggregator[A, B, _]] {
-  def convertToTfmaProto(underlying: T): Aggregator[A, B, MetricsForSlice]
+  def convertToTfmaProto(underlying: T): Aggregator[A, B, EvalResult]
+}
+
+sealed trait Plot {
+  val plotData: PlotsForSlice
+}
+object Plot {
+  case class CalibrationHistogram(plotData: PlotsForSlice) extends Plot
+  case class ConfusionMatrix(plotData: PlotsForSlice) extends Plot
+}
+
+case class EvalResult(metrics: MetricsForSlice, plots: Option[Plot])
+object EvalResult {
+  def apply(metrics: MetricsForSlice): EvalResult = EvalResult(metrics, None)
+  def apply(metrics: MetricsForSlice, plot: Plot): EvalResult = EvalResult(metrics, Some(plot))
 }
 
 object TfmaConverter {
 
+  implicit val errorRateSummaryConverter
+    : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
+    new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] {
+      override def convertToTfmaProto(underlying: ErrorRateSummary.type)
+        : Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
+        ErrorRateSummary.andThenPresent { ers =>
+          val metrics = MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics("Noether_ErrorRateSummary",
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(
+                            DoubleValue
+                              .newBuilder()
+                              .setValue(ers)
+                              .build())
+                          .build())
+            .build()
+          EvalResult(metrics)
+        }
+    }
+
+  implicit val binaryConfusionMatrixConverter
+    : TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
+    new TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] {
+      override def convertToTfmaProto(underlying: BinaryConfusionMatrix)
+        : Aggregator[BinaryPred, Map[(Int, Int), Long], EvalResult] = {
+        underlying
+          .andThenPresent(
+            (denseMatrixToConfusionMatrix(Some(underlying.threshold)) _)
+              .andThen { cm =>
+                val metrics = confusionMatrixToMetric(cm)
+                val plots = PlotsForSlice
+                  .newBuilder()
+                  .setSliceKey(SliceKey.getDefaultInstance)
+                  .setPlotData(
+                    PlotData
+                      .newBuilder()
+                      .setConfusionMatrixAtThresholds(cm))
+                  .build()
+                EvalResult(metrics, Plot.ConfusionMatrix(plots))
+              })
+      }
+
+    }
+
+  implicit val confusionMatrixConverter
+    : TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
+    new TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] {
+      override def convertToTfmaProto(underlying: ConfusionMatrix)
+        : Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], EvalResult] =
+        underlying.andThenPresent((denseMatrixToConfusionMatrix() _).andThen { cm =>
+          val metrics = confusionMatrixToMetric(cm)
+          val plots = PlotsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .setPlotData(
+              PlotData
+                .newBuilder()
+                .setConfusionMatrixAtThresholds(cm))
+            .build()
+          EvalResult(metrics, Plot.ConfusionMatrix(plots))
+        })
+    }
+
+  implicit val aucConverter: TfmaConverter[BinaryPred, MetricCurve, AUC] =
+    new TfmaConverter[BinaryPred, MetricCurve, AUC] {
+      override def convertToTfmaProto(
+        underlying: AUC): Aggregator[BinaryPred, MetricCurve, EvalResult] =
+        underlying
+          .andThenPresent { areaValue =>
+            val metricName = underlying.metric match {
+              case ROC => "Noether_AUC:ROC"
+              case PR  => "Noether_AUC:PR"
+            }
+            val metrics = MetricsForSlice
+              .newBuilder()
+              .setSliceKey(SliceKey.getDefaultInstance)
+              .putMetrics(metricName,
+                          MetricValue
+                            .newBuilder()
+                            .setDoubleValue(DoubleValue.newBuilder().setValue(areaValue))
+                            .build())
+              .build()
+            EvalResult(metrics)
+          }
+    }
+
+  implicit val logLossConverter
+    : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
+    new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] {
+      override def convertToTfmaProto(underlying: LogLoss.type)
+        : Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
+        underlying.andThenPresent { logLoss =>
+          val metricName = "Noether_LogLoss"
+          val metrics = MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(logLoss))
+                          .build())
+            .build()
+          EvalResult(metrics)
+        }
+    }
+
+  implicit def meanAvgPrecisionConverter[T]
+    : TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
+    new TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] {
+      override def convertToTfmaProto(underlying: MeanAveragePrecision[T])
+        : Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
+        underlying.andThenPresent { meanAvgPrecision =>
+          val metricName = "Noether_MeanAvgPrecision"
+          val metrics = MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(meanAvgPrecision))
+                          .build())
+            .build()
+          EvalResult(metrics)
+        }
+    }
+
+  implicit def ndcgAtKConverter[T]
+    : TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
+    new TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] {
+      override def convertToTfmaProto(
+        underlying: NdcgAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
+        underlying.andThenPresent { ndcgAtK =>
+          val metricName = "Noether_NdcgAtK"
+          val metrics = MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(ndcgAtK))
+                          .build())
+            .build()
+          EvalResult(metrics)
+        }
+    }
+
+  implicit def precisionAtK[T]
+    : TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
+    new TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] {
+      override def convertToTfmaProto(
+        underlying: PrecisionAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
+        underlying.andThenPresent { precisionAtK =>
+          val metricName = "Noether_PrecisionAtK"
+          val metrics = MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putMetrics(metricName,
+                        MetricValue
+                          .newBuilder()
+                          .setDoubleValue(DoubleValue.newBuilder().setValue(precisionAtK))
+                          .build())
+            .build()
+          EvalResult(metrics)
+        }
+    }
+
   private def denseMatrixToMetric(threshold: Option[Double] = None)(
     matrix: DenseMatrix[Long]): MetricsForSlice = {
+    val cm = denseMatrixToConfusionMatrix(threshold)(matrix)
+    MetricsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .putMetrics(
+        "Noether_ConfusionMatrix",
+        MetricValue
+          .newBuilder()
+          .setConfusionMatrixAtThresholds(cm)
+          .build()
+      )
+      .build()
+  }
+
+  private def confusionMatrixToMetric(cm: ConfusionMatrixAtThresholds): MetricsForSlice = {
+    MetricsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .putMetrics(
+        "Noether_ConfusionMatrix",
+        MetricValue
+          .newBuilder()
+          .setConfusionMatrixAtThresholds(cm)
+          .build()
+      )
+      .build()
+  }
+
+  private def denseMatrixToConfusionMatrix(threshold: Option[Double] = None)(
+    matrix: DenseMatrix[Long]): ConfusionMatrixAtThresholds = {
     val tp = matrix.valueAt(1, 1).toDouble
     val tn = matrix.valueAt(0, 0).toDouble
     val fp = matrix.valueAt(1, 0).toDouble
@@ -46,159 +259,10 @@ object TfmaConverter {
       .setPrecision(tp / (tp + fp))
       .setRecall(tp / (tp + fn))
 
-    threshold.foreach(cmBuilder.setThreshold(_))
-
-    MetricsForSlice
+    threshold.foreach(cmBuilder.setThreshold)
+    ConfusionMatrixAtThresholds
       .newBuilder()
-      .setSliceKey(SliceKey.getDefaultInstance)
-      .putMetrics(
-        "Noether_ConfusionMatrix",
-        MetricValue
-          .newBuilder()
-          .setConfusionMatrixAtThresholds(
-            ConfusionMatrixAtThresholds
-              .newBuilder()
-              .addMatrices(cmBuilder.build())
-              .build())
-          .build()
-      )
+      .addMatrices(cmBuilder.build())
       .build()
   }
-
-  implicit val errorRateSummaryConverter
-    : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
-    new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] {
-      override def convertToTfmaProto(underlying: ErrorRateSummary.type)
-        : Aggregator[Prediction[Int, List[Double]], (Double, Long), MetricsForSlice] =
-        ErrorRateSummary.andThenPresent { ers =>
-          MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics("Noether_ErrorRateSummary",
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(
-                            DoubleValue
-                              .newBuilder()
-                              .setValue(ers)
-                              .build())
-                          .build())
-            .build()
-        }
-    }
-
-  implicit val binaryConfusionMatrixConverter
-    : TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
-    new TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] {
-      override def convertToTfmaProto(underlying: BinaryConfusionMatrix)
-        : Aggregator[BinaryPred, Map[(Int, Int), Long], MetricsForSlice] =
-        underlying
-          .andThenPresent(denseMatrixToMetric(Some(underlying.threshold)))
-    }
-
-  implicit val confusionMatrixConverter
-    : TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
-    new TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] {
-      override def convertToTfmaProto(underlying: ConfusionMatrix)
-        : Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], MetricsForSlice] =
-        underlying.andThenPresent(denseMatrixToMetric())
-    }
-
-  implicit val aucConverter: TfmaConverter[BinaryPred, MetricCurve, AUC] =
-    new TfmaConverter[BinaryPred, MetricCurve, AUC] {
-      override def convertToTfmaProto(
-        underlying: AUC): Aggregator[BinaryPred, MetricCurve, MetricsForSlice] =
-        underlying
-          .andThenPresent { areaValue =>
-            val metricName = underlying.metric match {
-              case ROC => "Noether_AUC:ROC"
-              case PR  => "Noether_AUC:PR"
-            }
-            MetricsForSlice
-              .newBuilder()
-              .setSliceKey(SliceKey.getDefaultInstance)
-              .putMetrics(metricName,
-                          MetricValue
-                            .newBuilder()
-                            .setDoubleValue(DoubleValue.newBuilder().setValue(areaValue))
-                            .build())
-              .build()
-          }
-    }
-
-  implicit val logLossConverter
-    : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
-    new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] {
-      override def convertToTfmaProto(underlying: LogLoss.type)
-        : Aggregator[Prediction[Int, List[Double]], (Double, Long), MetricsForSlice] =
-        underlying.andThenPresent { logLoss =>
-          val metricName = "Noether_LogLoss"
-          MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(logLoss))
-                          .build())
-            .build()
-        }
-    }
-
-  implicit def meanAvgPrecisionConverter[T]
-    : TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
-    new TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] {
-      override def convertToTfmaProto(underlying: MeanAveragePrecision[T])
-        : Aggregator[RankingPrediction[T], (Double, Long), MetricsForSlice] =
-        underlying.andThenPresent { meanAvgPrecision =>
-          val metricName = "Noether_MeanAvgPrecision"
-          MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(meanAvgPrecision))
-                          .build())
-            .build()
-        }
-    }
-
-  implicit def ndcgAtKConverter[T]
-    : TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
-    new TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] {
-      override def convertToTfmaProto(
-        underlying: NdcgAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), MetricsForSlice] =
-        underlying.andThenPresent { ndcgAtK =>
-          val metricName = "Noether_NdcgAtK"
-          MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(ndcgAtK))
-                          .build())
-            .build()
-        }
-    }
-
-  implicit def precisionAtK[T]
-    : TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
-    new TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] {
-      override def convertToTfmaProto(underlying: PrecisionAtK[T])
-        : Aggregator[RankingPrediction[T], (Double, Long), MetricsForSlice] =
-        underlying.andThenPresent { precisionAtK =>
-          val metricName = "Noether_PrecisionAtK"
-          MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(precisionAtK))
-                          .build())
-            .build()
-        }
-    }
 }

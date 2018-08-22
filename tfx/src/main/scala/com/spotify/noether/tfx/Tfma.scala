@@ -24,7 +24,7 @@ object Tfma {
   trait ConversionOps[A, B, T <: Aggregator[A, B, _]] {
     val self: T
     val converter: TfmaConverter[A, B, T]
-    def asTfmaProto: Aggregator[A, B, MetricsForSlice] = converter.convertToTfmaProto(self)
+    def asTfmaProto: Aggregator[A, B, EvalResult] = converter.convertToTfmaProto(self)
   }
 
   object ConversionOps {

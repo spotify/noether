@@ -86,7 +86,8 @@ lazy val noetherCore: Project = project
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion,
       "org.scalatest" %% "scalatest" % scalaTestVersion
-    )
+    ),
+    fork in Test := true
   )
 
 lazy val noetherExamples: Project = project

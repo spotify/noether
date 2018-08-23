@@ -24,6 +24,8 @@ import com.twitter.algebird.Aggregator
 import tensorflow_model_analysis.MetricsForSliceOuterClass.ConfusionMatrixAtThresholds._
 import tensorflow_model_analysis.MetricsForSliceOuterClass._
 
+import scala.collection.JavaConverters._
+
 trait TfmaConverter[A, B, T <: Aggregator[A, B, _]] {
   def convertToTfmaProto(underlying: T): Aggregator[A, B, EvalResult]
 }
@@ -108,6 +110,37 @@ object TfmaConverter {
             .build()
           EvalResult(metrics, Plot.ConfusionMatrix(plots))
         })
+    }
+
+  implicit val classificationReportConverter
+    : TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport] =
+    new TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport] {
+      override def convertToTfmaProto(underlying: ClassificationReport)
+        : Aggregator[BinaryPred, Map[(Int, Int), Long], EvalResult] =
+        underlying.andThenPresent { report =>
+          val allMetrics = Map(
+            "Noether_Accuracy" -> report.accuracy,
+            "Noether_FPR" -> report.fpr,
+            "Noether_FScore" -> report.fscore,
+            "Noether_MCC" -> report.mcc,
+            "Noether_Precision" -> report.precision,
+            "Noether_Recall" -> report.recall
+          ).mapValues { m =>
+            MetricValue
+              .newBuilder()
+              .setDoubleValue(
+                DoubleValue
+                  .newBuilder()
+                  .setValue(m))
+              .build()
+          }
+          val metrics = MetricsForSlice
+            .newBuilder()
+            .setSliceKey(SliceKey.getDefaultInstance)
+            .putAllMetrics(allMetrics.asJava)
+            .build
+          EvalResult(metrics)
+        }
     }
 
   implicit val aucConverter: TfmaConverter[BinaryPred, MetricCurve, AUC] =

@@ -19,7 +19,7 @@ package com.spotify.noether.tfx
 
 import com.spotify.noether._
 import org.scalactic.{Equality, TolerantNumerics}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{Assertion, FlatSpec, Matchers}
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 
 class TfmaConverterTest extends FlatSpec with Matchers {
@@ -92,6 +92,30 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(plotCm.getTrueNegatives.toLong === 2L)
     assert(plotCm.getTruePositives.toLong === 3L)
 
+  }
+
+  it should "work with ClassificationReport" in {
+    val data = List(
+      (0.1, false),
+      (0.1, true),
+      (0.4, false),
+      (0.6, false),
+      (0.6, true),
+      (0.6, true),
+      (0.8, true)
+    ).map { case (s, pred) => Prediction(pred, s) }
+
+    val metrics = ClassificationReport().asTfmaProto(data).metrics
+
+    def assertMetric(name: String, expected: Double): Assertion =
+      assert(metrics.getMetricsMap.get(name).getDoubleValue.getValue === expected)
+
+    assertMetric("Noether_Accuracy", 0.7142857142857143)
+    assertMetric("Noether_FPR", 0.333)
+    assertMetric("Noether_FScore", 0.75)
+    assertMetric("Noether_MCC", 0.4166666666666667)
+    assertMetric("Noether_Precision", 0.75)
+    assertMetric("Noether_Recall", 0.75)
   }
 
   it should "work with ErrorRateSummary" in {

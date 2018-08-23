@@ -33,6 +33,11 @@ trait TfmaImplicits {
     : ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
     ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix](agg, c)
 
+  implicit def classificationReportConversion(agg: ClassificationReport)(
+    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport])
+    : ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport] =
+    ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport](agg, c)
+
   implicit def aucConversion(agg: AUC)(implicit c: TfmaConverter[BinaryPred, MetricCurve, AUC])
     : ConversionOps[BinaryPred, MetricCurve, AUC] =
     ConversionOps[BinaryPred, MetricCurve, AUC](agg, c)

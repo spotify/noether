@@ -52,19 +52,7 @@ object TfmaConverter {
       override def convertToTfmaProto(underlying: ErrorRateSummary.type)
         : Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
         ErrorRateSummary.andThenPresent { ers =>
-          val metrics = MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics("Noether_ErrorRateSummary",
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(
-                            DoubleValue
-                              .newBuilder()
-                              .setValue(ers)
-                              .build())
-                          .build())
-            .build()
+          val metrics = buildDoubleMetric("Noether_ErrorRateSummary", ers)
           EvalResult(metrics)
         }
     }
@@ -79,18 +67,10 @@ object TfmaConverter {
             (denseMatrixToConfusionMatrix(Some(underlying.threshold)) _)
               .andThen { cm =>
                 val metrics = confusionMatrixToMetric(cm)
-                val plots = PlotsForSlice
-                  .newBuilder()
-                  .setSliceKey(SliceKey.getDefaultInstance)
-                  .setPlotData(
-                    PlotData
-                      .newBuilder()
-                      .setConfusionMatrixAtThresholds(cm))
-                  .build()
+                val plots = buildCMPlot(cm)
                 EvalResult(metrics, Plot.ConfusionMatrix(plots))
               })
       }
-
     }
 
   implicit val confusionMatrixConverter
@@ -100,14 +80,7 @@ object TfmaConverter {
         : Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], EvalResult] =
         underlying.andThenPresent((denseMatrixToConfusionMatrix() _).andThen { cm =>
           val metrics = confusionMatrixToMetric(cm)
-          val plots = PlotsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .setPlotData(
-              PlotData
-                .newBuilder()
-                .setConfusionMatrixAtThresholds(cm))
-            .build()
+          val plots = buildCMPlot(cm)
           EvalResult(metrics, Plot.ConfusionMatrix(plots))
         })
     }
@@ -125,20 +98,8 @@ object TfmaConverter {
             "Noether_MCC" -> report.mcc,
             "Noether_Precision" -> report.precision,
             "Noether_Recall" -> report.recall
-          ).mapValues { m =>
-            MetricValue
-              .newBuilder()
-              .setDoubleValue(
-                DoubleValue
-                  .newBuilder()
-                  .setValue(m))
-              .build()
-          }
-          val metrics = MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putAllMetrics(allMetrics.asJava)
-            .build
+          )
+          val metrics = buildDoubleMetrics(allMetrics)
           EvalResult(metrics)
         }
     }
@@ -153,15 +114,7 @@ object TfmaConverter {
               case ROC => "Noether_AUC:ROC"
               case PR  => "Noether_AUC:PR"
             }
-            val metrics = MetricsForSlice
-              .newBuilder()
-              .setSliceKey(SliceKey.getDefaultInstance)
-              .putMetrics(metricName,
-                          MetricValue
-                            .newBuilder()
-                            .setDoubleValue(DoubleValue.newBuilder().setValue(areaValue))
-                            .build())
-              .build()
+            val metrics = buildDoubleMetric(metricName, areaValue)
             EvalResult(metrics)
           }
     }
@@ -172,16 +125,7 @@ object TfmaConverter {
       override def convertToTfmaProto(underlying: LogLoss.type)
         : Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
         underlying.andThenPresent { logLoss =>
-          val metricName = "Noether_LogLoss"
-          val metrics = MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(logLoss))
-                          .build())
-            .build()
+          val metrics = buildDoubleMetric("Noether_LogLoss", logLoss)
           EvalResult(metrics)
         }
     }
@@ -192,16 +136,7 @@ object TfmaConverter {
       override def convertToTfmaProto(underlying: MeanAveragePrecision[T])
         : Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
         underlying.andThenPresent { meanAvgPrecision =>
-          val metricName = "Noether_MeanAvgPrecision"
-          val metrics = MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(meanAvgPrecision))
-                          .build())
-            .build()
+          val metrics = buildDoubleMetric("Noether_MeanAvgPrecision", meanAvgPrecision)
           EvalResult(metrics)
         }
     }
@@ -212,16 +147,7 @@ object TfmaConverter {
       override def convertToTfmaProto(
         underlying: NdcgAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
         underlying.andThenPresent { ndcgAtK =>
-          val metricName = "Noether_NdcgAtK"
-          val metrics = MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(ndcgAtK))
-                          .build())
-            .build()
+          val metrics = buildDoubleMetric("Noether_NdcgAtK", ndcgAtK)
           EvalResult(metrics)
         }
     }
@@ -232,16 +158,7 @@ object TfmaConverter {
       override def convertToTfmaProto(
         underlying: PrecisionAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
         underlying.andThenPresent { precisionAtK =>
-          val metricName = "Noether_PrecisionAtK"
-          val metrics = MetricsForSlice
-            .newBuilder()
-            .setSliceKey(SliceKey.getDefaultInstance)
-            .putMetrics(metricName,
-                        MetricValue
-                          .newBuilder()
-                          .setDoubleValue(DoubleValue.newBuilder().setValue(precisionAtK))
-                          .build())
-            .build()
+          val metrics = buildDoubleMetric("Noether_PrecisionAtK", precisionAtK)
           EvalResult(metrics)
         }
     }
@@ -298,4 +215,41 @@ object TfmaConverter {
       .addMatrices(cmBuilder.build())
       .build()
   }
+
+  private def buildDoubleMetric(name: String, value: Double): MetricsForSlice =
+    MetricsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .putMetrics(name,
+                  MetricValue
+                    .newBuilder()
+                    .setDoubleValue(DoubleValue.newBuilder().setValue(value))
+                    .build())
+      .build()
+
+  private def buildDoubleMetrics(metrics: Map[String, Double]): MetricsForSlice = {
+    MetricsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .putAllMetrics(metrics.mapValues { m =>
+        MetricValue
+          .newBuilder()
+          .setDoubleValue(
+            DoubleValue
+              .newBuilder()
+              .setValue(m))
+          .build()
+      }.asJava)
+      .build()
+  }
+
+  private def buildCMPlot(cm: ConfusionMatrixAtThresholds): PlotsForSlice =
+    PlotsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .setPlotData(
+        PlotData
+          .newBuilder()
+          .setConfusionMatrixAtThresholds(cm))
+      .build()
 }

@@ -38,7 +38,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     ).map { case (s, pred) => Prediction(pred, s) }
 
     val evalResult = ConfusionMatrix(Seq(0, 1)).asTfmaProto(data)
-    val cmProto = evalResult.metrics
+    val cmProto = evalResult.metrics.get
 
     val cm = cmProto.getMetricsMap
       .get("Noether_ConfusionMatrix")
@@ -71,7 +71,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     ).map { case (pred, s) => Prediction(pred, s) }
 
     val evalResult = BinaryConfusionMatrix().asTfmaProto(data)
-    val cmProto = evalResult.metrics
+    val cmProto = evalResult.metrics.get
 
     val cm = cmProto.getMetricsMap
       .get("Noether_ConfusionMatrix")
@@ -108,7 +108,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     val metrics = ClassificationReport().asTfmaProto(data).metrics
 
     def assertMetric(name: String, expected: Double): Assertion =
-      assert(metrics.getMetricsMap.get(name).getDoubleValue.getValue === expected)
+      assert(metrics.get.getMetricsMap.get(name).getDoubleValue.getValue === expected)
 
     assertMetric("Noether_Accuracy", 0.7142857142857143)
     assertMetric("Noether_FPR", 0.333)
@@ -127,7 +127,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
         case (scores, label) => Prediction(label, scores)
       }
 
-    val ersProto: MetricsForSlice = ErrorRateSummary.asTfmaProto(data).metrics
+    val ersProto: MetricsForSlice = ErrorRateSummary.asTfmaProto(data).metrics.get
 
     val ersV =
       ersProto.getMetricsMap.get("Noether_ErrorRateSummary").getDoubleValue.getValue
@@ -145,8 +145,8 @@ class TfmaConverterTest extends FlatSpec with Matchers {
       (true, 0.6)
     ).map { case (pred, s) => Prediction(pred, s) }
 
-    val aucROCProto = AUC(ROC).asTfmaProto(data).metrics
-    val aucPRProto = AUC(PR).asTfmaProto(data).metrics
+    val aucROCProto = AUC(ROC).asTfmaProto(data).metrics.get
+    val aucPRProto = AUC(PR).asTfmaProto(data).metrics.get
 
     val actualROC = aucROCProto.getMetricsMap.get("Noether_AUC:ROC").getDoubleValue.getValue
     val actualPR = aucPRProto.getMetricsMap.get("Noether_AUC:PR").getDoubleValue.getValue
@@ -165,7 +165,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
       case (scores, label) => Prediction(label, scores)
     }
 
-    val logLossProto: MetricsForSlice = LogLoss.asTfmaProto(data).metrics
+    val logLossProto: MetricsForSlice = LogLoss.asTfmaProto(data).metrics.get
 
     val logLoss = logLossProto.getMetricsMap.get("Noether_LogLoss").getDoubleValue.getValue
     assert(logLoss === 0.363548039673)
@@ -173,7 +173,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
 
   it should "work with MeanAveragePrecision" in {
     import RankingData._
-    val proto = MeanAveragePrecision[Int]().asTfmaProto(rankingData).metrics
+    val proto = MeanAveragePrecision[Int]().asTfmaProto(rankingData).metrics.get
     val meanAvgPrecision = proto.getMetricsMap
       .get("Noether_MeanAvgPrecision")
       .getDoubleValue
@@ -189,6 +189,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
       NdcgAtK[Int](v)
         .asTfmaProto(rankingData)
         .metrics
+        .get
         .getMetricsMap
         .get("Noether_NdcgAtK")
         .getDoubleValue
@@ -208,6 +209,7 @@ class TfmaConverterTest extends FlatSpec with Matchers {
       PrecisionAtK[Int](v)
         .asTfmaProto(rankingData)
         .metrics
+        .get
         .getMetricsMap
         .get("Noether_PrecisionAtK")
         .getDoubleValue

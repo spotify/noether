@@ -38,10 +38,12 @@ object Plot {
   case class ConfusionMatrix(plotData: PlotsForSlice) extends Plot
 }
 
-case class EvalResult(metrics: MetricsForSlice, plots: Option[Plot])
+case class EvalResult(metrics: Option[MetricsForSlice], plots: Option[Plot])
 object EvalResult {
-  def apply(metrics: MetricsForSlice): EvalResult = EvalResult(metrics, None)
-  def apply(metrics: MetricsForSlice, plot: Plot): EvalResult = EvalResult(metrics, Some(plot))
+  def apply(metrics: MetricsForSlice): EvalResult = EvalResult(Some(metrics), None)
+  def apply(metrics: MetricsForSlice, plot: Plot): EvalResult =
+    EvalResult(Some(metrics), Some(plot))
+  def apply(plot: Plot): EvalResult = EvalResult(None, Some(plot))
 }
 
 object TfmaConverter {

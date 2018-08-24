@@ -69,7 +69,7 @@ object TfmaConverter {
             (denseMatrixToConfusionMatrix(Some(underlying.threshold)) _)
               .andThen { cm =>
                 val metrics = confusionMatrixToMetric(cm)
-                val plots = buildCMPlot(cm)
+                val plots = buildConfusionMatrixPlot(cm)
                 EvalResult(metrics, Plot.ConfusionMatrix(plots))
               })
       }
@@ -82,7 +82,7 @@ object TfmaConverter {
         : Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], EvalResult] =
         underlying.andThenPresent((denseMatrixToConfusionMatrix() _).andThen { cm =>
           val metrics = confusionMatrixToMetric(cm)
-          val plots = buildCMPlot(cm)
+          val plots = buildConfusionMatrixPlot(cm)
           EvalResult(metrics, Plot.ConfusionMatrix(plots))
         })
     }
@@ -162,6 +162,20 @@ object TfmaConverter {
         underlying.andThenPresent { precisionAtK =>
           val metrics = buildDoubleMetric("Noether_PrecisionAtK", precisionAtK)
           EvalResult(metrics)
+        }
+    }
+
+  implicit def calibrationHistogram: TfmaConverter[Prediction[Double, Double],
+                                                   Map[Double, (Double, Double, Long)],
+                                                   CalibrationHistogram] =
+    new TfmaConverter[Prediction[Double, Double],
+                      Map[Double, (Double, Double, Long)],
+                      CalibrationHistogram] {
+      override def convertToTfmaProto(underlying: CalibrationHistogram)
+        : Aggregator[Prediction[Double, Double], Map[Double, (Double, Double, Long)], EvalResult] =
+        underlying.andThenPresent { calibrationHistogram =>
+          val plot = buildCalibrationHistogramPlot(calibrationHistogram)
+          EvalResult(Plot.CalibrationHistogram(plot))
         }
     }
 
@@ -245,7 +259,7 @@ object TfmaConverter {
       .build()
   }
 
-  private def buildCMPlot(cm: ConfusionMatrixAtThresholds): PlotsForSlice =
+  private def buildConfusionMatrixPlot(cm: ConfusionMatrixAtThresholds): PlotsForSlice =
     PlotsForSlice
       .newBuilder()
       .setSliceKey(SliceKey.getDefaultInstance)
@@ -254,4 +268,33 @@ object TfmaConverter {
           .newBuilder()
           .setConfusionMatrixAtThresholds(cm))
       .build()
+
+  private def mkDoubleValue(d: Double): DoubleValue =
+    DoubleValue
+      .newBuilder()
+      .setValue(d)
+      .build()
+
+  private def buildCalibrationHistogramPlot(ch: List[CalibrationHistogramBucket]): PlotsForSlice =
+    PlotsForSlice
+      .newBuilder()
+      .setSliceKey(SliceKey.getDefaultInstance)
+      .setPlotData(
+        PlotData
+          .newBuilder()
+          .setCalibrationHistogramBuckets(CalibrationHistogramBuckets
+            .newBuilder()
+            .addAllBuckets(ch.map { b =>
+              CalibrationHistogramBuckets.Bucket
+                .newBuilder()
+                .setLowerThresholdInclusive(b.lowerThresholdInclusive)
+                .setUpperThresholdExclusive(b.upperThresholdExclusive)
+                .setTotalWeightedRefinedPrediction(mkDoubleValue(b.sumPredictions))
+                .setTotalWeightedLabel(mkDoubleValue(b.sumLabels))
+                .setNumWeightedExamples(mkDoubleValue(b.numPredictions))
+                .build()
+            }.asJava))
+          .build())
+      .build()
+
 }

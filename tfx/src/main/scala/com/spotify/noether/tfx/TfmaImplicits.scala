@@ -28,6 +28,17 @@ trait TfmaImplicits {
     : ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
     ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix](agg, c)
 
+  implicit def calibrationHistogramConversion(agg: CalibrationHistogram)(
+    implicit c: TfmaConverter[Prediction[Double, Double],
+                              Map[Double, (Double, Double, Long)],
+                              CalibrationHistogram])
+    : ConversionOps[Prediction[Double, Double],
+                    Map[Double, (Double, Double, Long)],
+                    CalibrationHistogram] =
+    ConversionOps[Prediction[Double, Double],
+                  Map[Double, (Double, Double, Long)],
+                  CalibrationHistogram](agg, c)
+
   implicit def binaryConfusionMatrixConversion(agg: BinaryConfusionMatrix)(
     implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix])
     : ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =

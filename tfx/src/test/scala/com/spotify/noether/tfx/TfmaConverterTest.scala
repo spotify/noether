@@ -21,6 +21,8 @@ import com.spotify.noether._
 import org.scalactic.{Equality, TolerantNumerics}
 import org.scalatest.{Assertion, FlatSpec, Matchers}
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
+import tensorflow_model_analysis.MetricsForSliceOuterClass.CalibrationHistogramBuckets
+import scala.collection.JavaConverters._
 
 class TfmaConverterTest extends FlatSpec with Matchers {
 
@@ -222,5 +224,57 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(getPrecisionAtK(5) === 0.8 / 3)
     assert(getPrecisionAtK(10) === 0.8 / 3)
     assert(getPrecisionAtK(15) === 8.0 / 45)
+  }
+
+  it should "work with CalibrationHistogram" in {
+    val data = Seq(
+      (0.15, 1.15), // lb
+      (0.288, 1.288), // rounding error puts this in (0.249, 0.288)
+      (0.30, 1.30), // (0.288, 0.3269)
+      (0.36, 1.36), // (0.3269, 0.365)
+      (0.555, 1.555), // (0.5219, 0.5609)
+      (1.2, 2.2), // ub
+      (0.7, 1.7) // ub
+    ).map { case (p, a) => Prediction(a, p) }
+
+    val result = CalibrationHistogram(0.21, 0.60, 10).asTfmaProto(data)
+
+    def protoToCaseClass(p: CalibrationHistogramBuckets.Bucket): CalibrationHistogramBucket = {
+      CalibrationHistogramBucket(
+        p.getLowerThresholdInclusive,
+        p.getUpperThresholdExclusive,
+        p.getNumWeightedExamples.getValue,
+        p.getTotalWeightedLabel.getValue,
+        p.getTotalWeightedRefinedPrediction.getValue
+      )
+    }
+
+    val actual =
+      result.plots.get.plotData.getPlotData.getCalibrationHistogramBuckets.getBucketsList.asScala
+        .map(protoToCaseClass)
+
+    val expected = List(
+      CalibrationHistogramBucket(Double.NegativeInfinity, 0.21, 1.0, 1.15, 0.15),
+      CalibrationHistogramBucket(0.21, 0.249, 0.0, 0.0, 0.0),
+      CalibrationHistogramBucket(0.249, 0.288, 1.0, 1.288, 0.288),
+      CalibrationHistogramBucket(0.288, 0.327, 1.0, 1.30, 0.30),
+      CalibrationHistogramBucket(0.327, 0.366, 1.0, 1.36, 0.36),
+      CalibrationHistogramBucket(0.366, 0.405, 0.0, 0.0, 0.0),
+      CalibrationHistogramBucket(0.405, 0.4449, 0.0, 0.0, 0.0),
+      CalibrationHistogramBucket(0.444, 0.483, 0.0, 0.0, 0.0),
+      CalibrationHistogramBucket(0.483, 0.522, 0.0, 0.0, 0.0),
+      CalibrationHistogramBucket(0.522, 0.561, 1.0, 1.555, 0.555),
+      CalibrationHistogramBucket(0.561, 0.6, 0.0, 0.0, 0.0),
+      CalibrationHistogramBucket(0.6, Double.PositiveInfinity, 2.0, 3.9, 1.9)
+    )
+
+    assert(actual.length == expected.length)
+    (0 until expected.length).foreach { i =>
+      assert(actual(i).numPredictions === expected(i).numPredictions)
+      assert(actual(i).sumPredictions === expected(i).sumPredictions)
+      assert(actual(i).sumLabels === expected(i).sumLabels)
+      assert(actual(i).lowerThresholdInclusive === expected(i).lowerThresholdInclusive)
+      assert(actual(i).upperThresholdExclusive === expected(i).upperThresholdExclusive)
+    }
   }
 }

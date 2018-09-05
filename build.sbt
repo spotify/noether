@@ -16,6 +16,9 @@
  */
 
 import sbt.Keys._
+import pl.project13.scala.sbt.JmhPlugin
+
+
 
 val breezeVersion = "1.0-RC2"
 val algebirdVersion = "0.13.4"
@@ -89,6 +92,13 @@ lazy val noetherCore: Project = project
     ),
     fork in Test := true
   )
+
+lazy val noetherBenchmark = project.in(file("benchmark"))
+  .settings(JmhPlugin.projectSettings:_*)
+  .settings(noPublishSettings)
+  .settings(
+    coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*",
+  ).dependsOn(noetherCore).enablePlugins(JmhPlugin)
 
 lazy val noetherExamples: Project = project
   .in(file("examples"))

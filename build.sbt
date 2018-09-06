@@ -15,10 +15,8 @@
  * under the License.
  */
 
-import sbt.Keys._
 import pl.project13.scala.sbt.JmhPlugin
-
-
+import sbt.Keys._
 
 val breezeVersion = "1.0-RC2"
 val algebirdVersion = "0.13.4"
@@ -95,7 +93,7 @@ lazy val noetherCore: Project = project
 
 lazy val noetherBenchmark = project
   .in(file("benchmark"))
-  .settings(JmhPlugin.projectSettings:_*)
+  .settings(JmhPlugin.projectSettings: _*)
   .settings(noPublishSettings)
   .settings(coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*")
   .dependsOn(noetherCore)

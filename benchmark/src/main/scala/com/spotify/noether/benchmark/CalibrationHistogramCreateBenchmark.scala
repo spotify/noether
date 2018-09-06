@@ -23,12 +23,10 @@ import org.openjdk.jmh.annotations._
 
 import scala.util.Random
 
-
 object PredictionUtils {
 
-  def generatePredictions(nbPrediction: Int): Seq[Prediction[Boolean, Double]] = {
+  def generatePredictions(nbPrediction: Int): Seq[Prediction[Boolean, Double]] =
     Seq.fill(nbPrediction)(Prediction(Random.nextBoolean(), Random.nextInt(99).toFloat / 100))
-  }
 }
 
 object CalibrationHistogramCreateBenchmark {
@@ -51,9 +49,8 @@ object CalibrationHistogramCreateBenchmark {
     var histogram: CalibrationHistogram = _
 
     @Setup
-    def setup(): Unit = {
+    def setup(): Unit =
       histogram = CalibrationHistogram(lowerBound, upperBound, nbBucket)
-    }
   }
 
 }
@@ -61,7 +58,6 @@ object CalibrationHistogramCreateBenchmark {
 class CalibrationHistogramCreateBenchmark {
 
   @Benchmark
-  def createCalibrationHistogram(calibrationHistogramState: CalibrationHistogramState): Double = {
+  def createCalibrationHistogram(calibrationHistogramState: CalibrationHistogramState): Double =
     calibrationHistogramState.histogram.bucketSize
-  }
 }

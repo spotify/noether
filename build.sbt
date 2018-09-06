@@ -94,6 +94,7 @@ lazy val noetherCore: Project = project
 lazy val noetherBenchmark = project
   .in(file("benchmark"))
   .settings(JmhPlugin.projectSettings: _*)
+  .settings(commonSettings)
   .settings(noPublishSettings)
   .settings(coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*")
   .dependsOn(noetherCore)

@@ -26,7 +26,7 @@ import scala.util.Random
 object PredictionUtils {
 
   def generatePredictions(nbPrediction: Int): Seq[Prediction[Boolean, Double]] =
-    Seq.fill(nbPrediction)(Prediction(Random.nextBoolean(), Random.nextInt(99).toFloat / 100))
+    Seq.fill(nbPrediction)(Prediction(Random.nextBoolean(), Random.nextDouble()))
 }
 
 object CalibrationHistogramCreateBenchmark {

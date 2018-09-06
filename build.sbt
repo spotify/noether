@@ -93,12 +93,13 @@ lazy val noetherCore: Project = project
     fork in Test := true
   )
 
-lazy val noetherBenchmark = project.in(file("benchmark"))
+lazy val noetherBenchmark = project
+  .in(file("benchmark"))
   .settings(JmhPlugin.projectSettings:_*)
   .settings(noPublishSettings)
-  .settings(
-    coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*",
-  ).dependsOn(noetherCore).enablePlugins(JmhPlugin)
+  .settings(coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*")
+  .dependsOn(noetherCore)
+  .enablePlugins(JmhPlugin)
 
 lazy val noetherExamples: Project = project
   .in(file("examples"))

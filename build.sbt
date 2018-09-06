@@ -75,7 +75,7 @@ lazy val root: Project = project
   .in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
-  .aggregate(noetherCore, noetherExamples)
+  .aggregate(noetherCore, noetherExamples, noetherBenchmark)
 
 lazy val noetherCore: Project = project
   .in(file("core"))

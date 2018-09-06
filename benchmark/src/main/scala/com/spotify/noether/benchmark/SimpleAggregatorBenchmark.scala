@@ -3,6 +3,6 @@ package benchmark
 
 object SimpleAggregatorBenchmark {
 
-  val metrics : AUCMetric = null
+  val metrics : AUCMetric = ROC
 
 }

@@ -12,3 +12,4 @@ tracks
 *.spl
 *.spi
 local_data
+*.iml

@@ -1,32 +1,31 @@
 
 # noether-benchmark
 
-This module describe benchmark for the noether project.
+This module describes benchmarking for the noether project.
 
 ## Run benchmark
 
-* Run sbt command to the top of the noether porject
+* Open an sbt shell in the project root:
 
            sbt 
 
-* then localise the sbt project to the noetherBenchmark module
+* Then switch to the subproject `noetherBenchmark`
 
         
-        # Be localised on the noether-benchmar project.
         sbt:noether> project noetherBenchmark
         
-        # Launch all the benchmark..
+        # Run all the benchmarks..
         sbt:noetherBenchmark> jmh:run .*
         
-        # launch specify benchmark (CalibrationHistogram benchmark)
+        # Run specific benchmark (CalibrationHistogram benchmark)
         sbt:noetherBenchmark> jmh:run .*CalibrationHistogram.*
 
-### example
+### Example
 
         jmh:run -t1 -f1 -wi 2 -i 3 .*Calibration.*
 
 
-give something like : 
+The output should look something like this: 
 
 
     [info] Benchmark                                                       (lowerBound)  (nbBucket)  (nbElement)  (upperBound)   Mode  Cnt          Score            Error  Units

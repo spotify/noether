@@ -15,6 +15,7 @@
  * under the License.
  */
 
+import pl.project13.scala.sbt.JmhPlugin
 import sbt.Keys._
 
 val breezeVersion = "1.0-RC2"
@@ -72,7 +73,7 @@ lazy val root: Project = project
   .in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
-  .aggregate(noetherCore, noetherExamples)
+  .aggregate(noetherCore, noetherExamples, noetherBenchmark)
 
 lazy val noetherCore: Project = project
   .in(file("core"))
@@ -89,6 +90,15 @@ lazy val noetherCore: Project = project
     ),
     fork in Test := true
   )
+
+lazy val noetherBenchmark = project
+  .in(file("benchmark"))
+  .settings(JmhPlugin.projectSettings: _*)
+  .settings(commonSettings)
+  .settings(noPublishSettings)
+  .settings(coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*")
+  .dependsOn(noetherCore)
+  .enablePlugins(JmhPlugin)
 
 lazy val noetherExamples: Project = project
   .in(file("examples"))

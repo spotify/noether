@@ -63,16 +63,10 @@ val commonSettings = Seq(
   )
 )
 
-val noPublishSettings = Seq(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false
-)
-
 lazy val root: Project = project
   .in(file("."))
   .settings(commonSettings)
-  .settings(noPublishSettings)
+  .settings(publish / skip := true)
   .aggregate(noetherCore, noetherExamples, noetherBenchmark)
 
 lazy val noetherCore: Project = project
@@ -95,19 +89,21 @@ lazy val noetherBenchmark = project
   .in(file("benchmark"))
   .settings(JmhPlugin.projectSettings: _*)
   .settings(commonSettings)
-  .settings(noPublishSettings)
-  .settings(coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*")
+  .settings(
+    publish / skip := true,
+    coverageExcludedPackages := "com\\.spotify\\.noether\\.benchmark.*"
+  )
   .dependsOn(noetherCore)
   .enablePlugins(JmhPlugin)
 
 lazy val noetherExamples: Project = project
   .in(file("examples"))
   .settings(commonSettings)
-  .settings(noPublishSettings)
   .settings(
     name := "noether-examples",
     moduleName := "noether-examples",
-    description := "Noether Examples"
+    description := "Noether Examples",
+    publish / skip := true
   )
   .dependsOn(noetherCore)
 

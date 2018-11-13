@@ -5,6 +5,7 @@ Noether
 [![codecov.io](https://codecov.io/github/spotify/noether/coverage.svg?branch=master)](https://codecov.io/github/spotify/noether?branch=master)
 [![GitHub license](https://img.shields.io/github/license/spotify/noether.svg)](./LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/com.spotify/noether-core_2.12.svg)](https://maven-badges.herokuapp.com/maven-central/com.spotify/noether-core_2.12)
+[![Scaladoc](https://img.shields.io/badge/scaladoc-latest-blue.svg)](https://spotify.github.io/noether/latest/api/com/spotify/noether/index.html)
 
 > [Emmy Noether](https://en.wikipedia.org/wiki/Emmy_Noether) was a German mathematician known for her landmark contributions to abstract algebra and theoretical physics. 
 

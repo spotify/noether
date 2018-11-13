@@ -16,13 +16,15 @@
  */
 
 import pl.project13.scala.sbt.JmhPlugin
+import sbt._
 import sbt.Keys._
+import com.typesafe.sbt.SbtGit.GitKeys._
 
 val breezeVersion = "1.0-RC2"
 val algebirdVersion = "0.13.5"
 val scalaTestVersion = "3.0.5"
 
-val commonSettings = Seq(
+val commonSettings = Def.settings(
   organization := "com.spotify",
   name := "noether",
   description := "ML Aggregators",
@@ -67,7 +69,24 @@ lazy val root: Project = project
   .in(file("."))
   .settings(commonSettings)
   .settings(publish / skip := true)
-  .aggregate(noetherCore, noetherExamples, noetherBenchmark)
+  .aggregate(
+    noetherCore,
+    noetherExamples,
+    noetherBenchmark,
+    noetherDocs
+  )
+
+lazy val noetherDocs: Project = project
+  .in(file("docs"))
+  .settings(commonSettings)
+  .settings(docSettings)
+  .settings(
+    name := "noether-docs",
+    publish / skip := true,
+    ghpagesNoJekyll := true,
+    gitRemoteRepo := "git@github.com:spotify/noether.git"
+  )
+  .enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
 lazy val noetherCore: Project = project
   .in(file("core"))
@@ -106,6 +125,12 @@ lazy val noetherExamples: Project = project
     publish / skip := true
   )
   .dependsOn(noetherCore)
+
+lazy val docSettings = Def.settings(
+  autoAPIMappings := true,
+  siteSubdirName in ScalaUnidoc := "latest/api",
+  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc)
+)
 
 // sampled from https://tpolecat.github.io/2017/04/25/scalac-flags.html
 lazy val commonScalacOptions = Seq(

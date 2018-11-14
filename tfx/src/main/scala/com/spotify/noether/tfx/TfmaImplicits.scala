@@ -112,27 +112,32 @@ trait TfmaImplicits {
       .setValue(d)
       .build()
 
-  private def buildCalibrationHistogramPlot(ch: List[CalibrationHistogramBucket]): PlotsForSlice =
+  private def buildCalibrationHistogramPlot(ch: List[CalibrationHistogramBucket]): PlotsForSlice = {
+
+    val plotData = PlotData
+      .newBuilder()
+      .setCalibrationHistogramBuckets(
+        CalibrationHistogramBuckets
+          .newBuilder()
+          .addAllBuckets(ch.map { b =>
+            CalibrationHistogramBuckets.Bucket
+              .newBuilder()
+              .setLowerThresholdInclusive(b.lowerThresholdInclusive)
+              .setUpperThresholdExclusive(b.upperThresholdExclusive)
+              .setTotalWeightedRefinedPrediction(mkDoubleValue(b.sumPredictions))
+              .setTotalWeightedLabel(mkDoubleValue(b.sumLabels))
+              .setNumWeightedExamples(mkDoubleValue(b.numPredictions))
+              .build()
+          }.asJava))
+      .build()
+
     PlotsForSlice
       .newBuilder()
       .setSliceKey(SliceKey.getDefaultInstance)
-      .setPlotData(
-        PlotData
-          .newBuilder()
-          .setCalibrationHistogramBuckets(CalibrationHistogramBuckets
-            .newBuilder()
-            .addAllBuckets(ch.map { b =>
-              CalibrationHistogramBuckets.Bucket
-                .newBuilder()
-                .setLowerThresholdInclusive(b.lowerThresholdInclusive)
-                .setUpperThresholdExclusive(b.upperThresholdExclusive)
-                .setTotalWeightedRefinedPrediction(mkDoubleValue(b.sumPredictions))
-                .setTotalWeightedLabel(mkDoubleValue(b.sumLabels))
-                .setNumWeightedExamples(mkDoubleValue(b.numPredictions))
-                .build()
-            }.asJava))
-          .build())
+      .setPlotData(plotData)
       .build()
+  }
+
   implicit def confusionMatrixConversion(agg: ConfusionMatrix)(
     implicit c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix])
     : ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =

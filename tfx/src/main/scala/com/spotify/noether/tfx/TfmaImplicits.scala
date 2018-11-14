@@ -29,21 +29,6 @@ import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
 trait TfmaImplicits {
-  private def denseMatrixToMetric(threshold: Option[Double] = None)(
-    matrix: DenseMatrix[Long]): MetricsForSlice = {
-    val cm = denseMatrixToConfusionMatrix(threshold)(matrix)
-    MetricsForSlice
-      .newBuilder()
-      .setSliceKey(SliceKey.getDefaultInstance)
-      .putMetrics(
-        "Noether_ConfusionMatrix",
-        MetricValue
-          .newBuilder()
-          .setConfusionMatrixAtThresholds(cm)
-          .build()
-      )
-      .build()
-  }
 
   private def confusionMatrixToMetric(cm: ConfusionMatrixAtThresholds): MetricsForSlice = {
     MetricsForSlice
@@ -94,18 +79,20 @@ trait TfmaImplicits {
       .build()
 
   private def buildDoubleMetrics(metrics: Map[String, Double]): MetricsForSlice = {
+    val metricValues = metrics.mapValues { m =>
+      MetricValue
+        .newBuilder()
+        .setDoubleValue(
+          DoubleValue
+            .newBuilder()
+            .setValue(m))
+        .build()
+    }.asJava
+
     MetricsForSlice
       .newBuilder()
       .setSliceKey(SliceKey.getDefaultInstance)
-      .putAllMetrics(metrics.mapValues { m =>
-        MetricValue
-          .newBuilder()
-          .setDoubleValue(
-            DoubleValue
-              .newBuilder()
-              .setValue(m))
-          .build()
-      }.asJava)
+      .putAllMetrics(metricValues)
       .build()
   }
 

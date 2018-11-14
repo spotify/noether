@@ -57,6 +57,24 @@ See the docs on each aggregator for a more detailed walk-through on the function
 5. ErrorRateSummary
     1. Available for multiclass. Returns the proportion of misclassified predictions.w      
 
+# Tensorflow Model Analysis Support 
+
+noether supports outputting metrics as TFX `metrics_for_slice` protobufs, which can be used in TFMA methods.
+
+```scala
+    val data = List(
+      (0, 0),
+      (0, 1),
+      (0, 0),
+      (1, 0),
+      (1, 1),
+      (1, 1),
+      (1, 1)
+    ).map { case (s, pred) => Prediction(pred, s) }
+
+    val tfmaProto = ConfusionMatrix(Seq(0, 1)).asTfmaProto(data)
+```
+
 # License
 
 Copyright 2016-2018 Spotify AB.

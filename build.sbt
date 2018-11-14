@@ -63,10 +63,10 @@ val commonSettings = Def.settings(
               name = "Filipe Regadas",
               email = "filiperegadas@gmail.com",
               url = url("https://twitter.com/regadas")),
-    Developer(id="andrewsmartin",
-              name="Andrew Martin",
-              email="andrewsmartin.mg@gmail.com",
-              url=url("https://twitter.com/andrew_martin92"))
+    Developer(id = "andrewsmartin",
+              name = "Andrew Martin",
+              email = "andrewsmartin.mg@gmail.com",
+              url = url("https://twitter.com/andrew_martin92"))
   )
 )
 

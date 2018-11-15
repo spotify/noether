@@ -59,20 +59,27 @@ See the docs on each aggregator for a more detailed walk-through on the function
 
 # Tensorflow Model Analysis Support 
 
-noether supports outputting metrics as TFX `metrics_for_slice` protobufs, which can be used in TFMA methods.
+Noether supports outputting metrics as TFX `metrics_for_slice` protobufs, which can be used in 
+TFMA methods. This is available in the `noether-tfx` package:
 
 ```scala
-    val data = List(
-      (0, 0),
-      (0, 1),
-      (0, 0),
-      (1, 0),
-      (1, 1),
-      (1, 1),
-      (1, 1)
-    ).map { case (s, pred) => Prediction(pred, s) }
+libraryDependencies += "com.spotify.noether" %% "noether-tfx" % noetherVersion
+```
 
-    val tfmaProto = ConfusionMatrix(Seq(0, 1)).asTfmaProto(data)
+```scala
+import com.spotify.noether.tfx._
+
+val data = List(
+  (0, 0),
+  (0, 1),
+  (0, 0),
+  (1, 0),
+  (1, 1),
+  (1, 1),
+  (1, 1)
+).map { case (s, pred) => Prediction(pred, s) }
+
+val tfmaProto = ConfusionMatrix(Seq(0, 1)).asTfmaProto(data)
 ```
 
 # License

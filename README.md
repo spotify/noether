@@ -63,7 +63,7 @@ Noether supports outputting metrics as TFX `metrics_for_slice` protobufs, which 
 TFMA methods. This is available in the `noether-tfx` package:
 
 ```scala
-libraryDependencies += "com.spotify.noether" %% "noether-tfx" % noetherVersion
+libraryDependencies += "com.spotify" %% "noether-tfx" % noetherVersion
 ```
 
 ```scala

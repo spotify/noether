@@ -25,7 +25,7 @@ trait TfmaConverter[A, B, T <: Aggregator[A, B, _]] {
 }
 
 sealed trait Plot {
-  val plotData: PlotsForSlice
+  def plotData: PlotsForSlice
 }
 object Plot {
   case class CalibrationHistogram(plotData: PlotsForSlice) extends Plot

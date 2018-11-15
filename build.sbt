@@ -155,7 +155,7 @@ lazy val noetherTFX: Project = project
     protobufRunProtoc in ProtobufConfig := (args =>
       // protoc-jar does not include 3.3.1 binary
       com.github.os72.protocjar.Protoc.runProtoc("-v3.3.0" +: args.toArray)),
-    // Avro and Protobuf files are compiled to src_managed/main/compiled_{avro,protobuf}
+    // Protobuf files are compiled to src_managed/main/compiled_protobuf
     // Exclude their parent to avoid confusing IntelliJ
     sourceDirectories in Compile := (sourceDirectories in Compile).value
       .filterNot(_.getPath.endsWith("/src_managed/main")),

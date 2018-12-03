@@ -31,6 +31,7 @@ cache:
   directories:
     - $HOME/.sbt/boot
     - $HOME/.ivy2/cache
+    - $HOME/.cache/coursier
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache

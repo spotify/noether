@@ -13,3 +13,6 @@ tracks
 *.spi
 local_data
 *.iml
+
+.metals
+.bloop

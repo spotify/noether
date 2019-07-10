@@ -153,7 +153,7 @@ lazy val noetherTFX: Project = project
     ),
     version in ProtobufConfig := protobufVersion,
     protobufRunProtoc in ProtobufConfig := (args =>
-      com.github.os72.protocjar.Protoc.runProtoc("-v3.7.1" +: args.toArray)),
+      com.github.os72.protocjar.Protoc.runProtoc("-v3.8.0" +: args.toArray)),
     // Protobuf files are compiled to src_managed/main/compiled_protobuf
     // Exclude their parent to avoid confusing IntelliJ
     sourceDirectories in Compile := (sourceDirectories in Compile).value

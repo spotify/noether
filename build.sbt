@@ -20,7 +20,7 @@ import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit.GitKeys._
 
-val breezeVersion = "1.0-RC2"
+val breezeVersion = "1.0-RC4"
 val algebirdVersion = "0.13.5"
 val scalaTestVersion = "3.0.8"
 val protobufVersion = "3.7.1"

@@ -28,12 +28,14 @@ import com.twitter.algebird.{Aggregator, Semigroup}
  * @param accuracy <a href="https://en.wikipedia.org/wiki/Accuracy_and_precision"> Accuracy </a>
  * @param fpr <a href="https://en.wikipedia.org/wiki/False_positive_rate"> False Positive Rate </a>
  */
-final case class Report(mcc: Double,
-                        fscore: Double,
-                        precision: Double,
-                        recall: Double,
-                        accuracy: Double,
-                        fpr: Double)
+final case class Report(
+  mcc: Double,
+  fscore: Double,
+  precision: Double,
+  recall: Double,
+  accuracy: Double,
+  fpr: Double
+)
 
 /**
  * Generate a Classification Report for a collection of binary predictions.
@@ -108,7 +110,9 @@ final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
       val fScoreDenom = (betaSqr * precision) + recall
       val fscore = if (fScoreDenom > 0.0) {
         (1 + betaSqr) * ((precision * recall) / fScoreDenom)
-      } else { 1.0 }
+      } else {
+        1.0
+      }
 
       result + (clazz -> Report(mcc, fscore, precision, recall, accuracy, fpr))
     }

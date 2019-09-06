@@ -30,7 +30,8 @@ object Tfma {
   object ConversionOps {
     def apply[A, B, T <: Aggregator[A, B, _]](
       instance: T,
-      tfmaConverter: TfmaConverter[A, B, T]): ConversionOps[A, B, T] =
+      tfmaConverter: TfmaConverter[A, B, T]
+    ): ConversionOps[A, B, T] =
       new ConversionOps[A, B, T] {
         override val self: T = instance
         override val converter: TfmaConverter[A, B, T] = tfmaConverter

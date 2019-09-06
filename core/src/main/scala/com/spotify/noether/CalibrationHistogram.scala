@@ -29,11 +29,13 @@ import scala.math.floor
  * @param sumLabels Sum of label values for this bucket
  * @param sumPredictions Sum of prediction values for this bucket
  */
-final case class CalibrationHistogramBucket(lowerThresholdInclusive: Double,
-                                            upperThresholdExclusive: Double,
-                                            numPredictions: Double,
-                                            sumLabels: Double,
-                                            sumPredictions: Double)
+final case class CalibrationHistogramBucket(
+  lowerThresholdInclusive: Double,
+  upperThresholdExclusive: Double,
+  numPredictions: Double,
+  sumLabels: Double,
+  sumPredictions: Double
+)
 
 /**
  * Split predictions into Tensorflow Model Analysis compatible CalibrationHistogramBucket buckets.
@@ -45,12 +47,13 @@ final case class CalibrationHistogramBucket(lowerThresholdInclusive: Double,
  * @param upperBound Right boundary, exclusive
  * @param numBuckets Number of buckets in the histogram
  */
-final case class CalibrationHistogram(lowerBound: Double = 0.0,
-                                      upperBound: Double = 1.0,
-                                      numBuckets: Int = 10)
-    extends Aggregator[Prediction[Double, Double],
-                       Map[Double, (Double, Double, Long)],
-                       List[CalibrationHistogramBucket]] {
+final case class CalibrationHistogram(
+  lowerBound: Double = 0.0,
+  upperBound: Double = 1.0,
+  numBuckets: Int = 10
+) extends Aggregator[Prediction[Double, Double], Map[Double, (Double, Double, Long)], List[
+      CalibrationHistogramBucket
+    ]] {
 
   val bucketSize = (upperBound - lowerBound) / numBuckets.toDouble
 

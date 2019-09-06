@@ -48,25 +48,36 @@ val commonSettings = Def.settings(
   licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
   homepage := Some(url("https://github.com/spotify/noether")),
   scmInfo := Some(
-    ScmInfo(url("https://github.com/spotify/noether.git"),
-            "scm:git:git@github.com:spotify/noether.git")),
+    ScmInfo(
+      url("https://github.com/spotify/noether.git"),
+      "scm:git:git@github.com:spotify/noether.git"
+    )
+  ),
   developers := List(
-    Developer(id = "rwhitcomb",
-              name = "Richard Whitcomb",
-              email = "richwhitjr@gmail.com",
-              url = url("https://twitter.com/rwhitcomb")),
-    Developer(id = "fallonfofallon",
-              name = "Fallon Chen",
-              email = "fallon@spotify.com",
-              url = url("https://twitter.com/fallonfofallon")),
-    Developer(id = "regadas",
-              name = "Filipe Regadas",
-              email = "filiperegadas@gmail.com",
-              url = url("https://twitter.com/regadas")),
-    Developer(id = "andrewsmartin",
-              name = "Andrew Martin",
-              email = "andrewsmartin.mg@gmail.com",
-              url = url("https://twitter.com/andrew_martin92"))
+    Developer(
+      id = "rwhitcomb",
+      name = "Richard Whitcomb",
+      email = "richwhitjr@gmail.com",
+      url = url("https://twitter.com/rwhitcomb")
+    ),
+    Developer(
+      id = "fallonfofallon",
+      name = "Fallon Chen",
+      email = "fallon@spotify.com",
+      url = url("https://twitter.com/fallonfofallon")
+    ),
+    Developer(
+      id = "regadas",
+      name = "Filipe Regadas",
+      email = "filiperegadas@gmail.com",
+      url = url("https://twitter.com/regadas")
+    ),
+    Developer(
+      id = "andrewsmartin",
+      name = "Andrew Martin",
+      email = "andrewsmartin.mg@gmail.com",
+      url = url("https://twitter.com/andrew_martin92")
+    )
   )
 )
 
@@ -152,8 +163,9 @@ lazy val noetherTFX: Project = project
       "com.google.protobuf" % "protobuf-java" % protobufVersion % ProtobufConfig.name
     ),
     version in ProtobufConfig := protobufVersion,
-    protobufRunProtoc in ProtobufConfig := (args =>
-      com.github.os72.protocjar.Protoc.runProtoc("-v3.7.1" +: args.toArray)),
+    protobufRunProtoc in ProtobufConfig := (
+      args => com.github.os72.protocjar.Protoc.runProtoc("-v3.7.1" +: args.toArray)
+    ),
     // Protobuf files are compiled to src_managed/main/compiled_protobuf
     // Exclude their parent to avoid confusing IntelliJ
     sourceDirectories in Compile := (sourceDirectories in Compile).value
@@ -252,5 +264,6 @@ def mimaSettings(moduleName: String): Seq[Def.Setting[Set[sbt.ModuleID]]] = {
   Seq(
     mimaPreviousArtifacts := (mimaVersions(version.value) ++ extraVersions)
       .diff(excludedVersions)
-      .map(v => "com.spotify" %% moduleName % v))
+      .map(v => "com.spotify" %% moduleName % v)
+  )
 }

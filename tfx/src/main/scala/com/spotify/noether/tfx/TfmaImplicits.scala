@@ -44,8 +44,9 @@ trait TfmaImplicits {
       .build()
   }
 
-  private def denseMatrixToConfusionMatrix(threshold: Option[Double] = None)(
-    matrix: DenseMatrix[Long]): ConfusionMatrixAtThresholds = {
+  private def denseMatrixToConfusionMatrix(
+    threshold: Option[Double] = None
+  )(matrix: DenseMatrix[Long]): ConfusionMatrixAtThresholds = {
     val tp = matrix.valueAt(1, 1).toDouble
     val tn = matrix.valueAt(0, 0).toDouble
     val fp = matrix.valueAt(1, 0).toDouble
@@ -71,11 +72,13 @@ trait TfmaImplicits {
     MetricsForSlice
       .newBuilder()
       .setSliceKey(SliceKey.getDefaultInstance)
-      .putMetrics(name,
-                  MetricValue
-                    .newBuilder()
-                    .setDoubleValue(DoubleValue.newBuilder().setValue(value))
-                    .build())
+      .putMetrics(
+        name,
+        MetricValue
+          .newBuilder()
+          .setDoubleValue(DoubleValue.newBuilder().setValue(value))
+          .build()
+      )
       .build()
 
   private def buildDoubleMetrics(metrics: Map[String, Double]): MetricsForSlice = {
@@ -85,7 +88,8 @@ trait TfmaImplicits {
         .setDoubleValue(
           DoubleValue
             .newBuilder()
-            .setValue(m))
+            .setValue(m)
+        )
         .build()
     }.asJava
 
@@ -103,7 +107,8 @@ trait TfmaImplicits {
       .setPlotData(
         PlotData
           .newBuilder()
-          .setConfusionMatrixAtThresholds(cm))
+          .setConfusionMatrixAtThresholds(cm)
+      )
       .build()
 
   private def mkDoubleValue(d: Double): DoubleValue =
@@ -128,7 +133,8 @@ trait TfmaImplicits {
               .setTotalWeightedLabel(mkDoubleValue(b.sumLabels))
               .setNumWeightedExamples(mkDoubleValue(b.numPredictions))
               .build()
-          }.asJava))
+          }.asJava)
+      )
       .build()
 
     PlotsForSlice
@@ -139,65 +145,68 @@ trait TfmaImplicits {
   }
 
   implicit def confusionMatrixConversion(agg: ConfusionMatrix)(
-    implicit c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix])
-    : ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
+    implicit c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix]
+  ): ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
     ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix](agg, c)
 
   implicit def calibrationHistogramConversion(agg: CalibrationHistogram)(
-    implicit c: TfmaConverter[Prediction[Double, Double],
-                              Map[Double, (Double, Double, Long)],
-                              CalibrationHistogram])
-    : ConversionOps[Prediction[Double, Double],
-                    Map[Double, (Double, Double, Long)],
-                    CalibrationHistogram] =
-    ConversionOps[Prediction[Double, Double],
-                  Map[Double, (Double, Double, Long)],
-                  CalibrationHistogram](agg, c)
+    implicit c: TfmaConverter[
+      Prediction[Double, Double],
+      Map[Double, (Double, Double, Long)],
+      CalibrationHistogram
+    ]
+  ): ConversionOps[Prediction[Double, Double], Map[Double, (Double, Double, Long)], CalibrationHistogram] =
+    ConversionOps[Prediction[Double, Double], Map[Double, (Double, Double, Long)], CalibrationHistogram](
+      agg,
+      c
+    )
 
   implicit def binaryConfusionMatrixConversion(agg: BinaryConfusionMatrix)(
-    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix])
-    : ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
+    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix]
+  ): ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
     ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix](agg, c)
 
   implicit def classificationReportConversion(agg: ClassificationReport)(
-    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport])
-    : ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport] =
+    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport]
+  ): ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport] =
     ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport](agg, c)
 
-  implicit def aucConversion(agg: AUC)(implicit c: TfmaConverter[BinaryPred, MetricCurve, AUC])
-    : ConversionOps[BinaryPred, MetricCurve, AUC] =
+  implicit def aucConversion(agg: AUC)(
+    implicit c: TfmaConverter[BinaryPred, MetricCurve, AUC]
+  ): ConversionOps[BinaryPred, MetricCurve, AUC] =
     ConversionOps[BinaryPred, MetricCurve, AUC](agg, c)
 
   implicit def errorRateSummaryConversion(agg: ErrorRateSummary.type)(
-    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type])
-    : ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
+    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type]
+  ): ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
     ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type](agg, c)
 
   implicit def logLossConversion(agg: LogLoss.type)(
-    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type])
-    : ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
+    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type]
+  ): ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
     ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type](agg, c)
 
   implicit def meanAvgPrecisionConversion[T](agg: MeanAveragePrecision[T])(
-    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]])
-    : ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
+    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]]
+  ): ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]](agg, c)
 
   implicit def ndcgAtKConversion[T](agg: NdcgAtK[T])(
-    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]])
-    : ConversionOps[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
+    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]]
+  ): ConversionOps[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), NdcgAtK[T]](agg, c)
 
   implicit def precisionAtKConversion[T](agg: PrecisionAtK[T])(
-    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]])
-    : ConversionOps[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
+    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]]
+  ): ConversionOps[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), PrecisionAtK[T]](agg, c)
 
   implicit val errorRateSummaryConverter
     : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
     new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] {
-      override def convertToTfmaProto(underlying: ErrorRateSummary.type)
-        : Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
+      override def convertToTfmaProto(
+        underlying: ErrorRateSummary.type
+      ): Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
         ErrorRateSummary.andThenPresent { ers =>
           val metrics = buildDoubleMetric("Noether_ErrorRateSummary", ers)
           EvalResult(metrics)
@@ -207,8 +216,9 @@ trait TfmaImplicits {
   implicit val binaryConfusionMatrixConverter
     : TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
     new TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] {
-      override def convertToTfmaProto(underlying: BinaryConfusionMatrix)
-        : Aggregator[BinaryPred, Map[(Int, Int), Long], EvalResult] = {
+      override def convertToTfmaProto(
+        underlying: BinaryConfusionMatrix
+      ): Aggregator[BinaryPred, Map[(Int, Int), Long], EvalResult] = {
         underlying
           .andThenPresent(
             (denseMatrixToConfusionMatrix(Some(underlying.threshold)) _)
@@ -216,15 +226,17 @@ trait TfmaImplicits {
                 val metrics = confusionMatrixToMetric(cm)
                 val plots = buildConfusionMatrixPlot(cm)
                 EvalResult(metrics, Plot.ConfusionMatrix(plots))
-              })
+              }
+          )
       }
     }
 
   implicit val confusionMatrixConverter
     : TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
     new TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] {
-      override def convertToTfmaProto(underlying: ConfusionMatrix)
-        : Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], EvalResult] =
+      override def convertToTfmaProto(
+        underlying: ConfusionMatrix
+      ): Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], EvalResult] =
         underlying.andThenPresent((denseMatrixToConfusionMatrix() _).andThen { cm =>
           val metrics = confusionMatrixToMetric(cm)
           val plots = buildConfusionMatrixPlot(cm)
@@ -235,8 +247,9 @@ trait TfmaImplicits {
   implicit val classificationReportConverter
     : TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport] =
     new TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport] {
-      override def convertToTfmaProto(underlying: ClassificationReport)
-        : Aggregator[BinaryPred, Map[(Int, Int), Long], EvalResult] =
+      override def convertToTfmaProto(
+        underlying: ClassificationReport
+      ): Aggregator[BinaryPred, Map[(Int, Int), Long], EvalResult] =
         underlying.andThenPresent { report =>
           val allMetrics = Map(
             "Noether_Accuracy" -> report.accuracy,
@@ -254,7 +267,8 @@ trait TfmaImplicits {
   implicit val aucConverter: TfmaConverter[BinaryPred, MetricCurve, AUC] =
     new TfmaConverter[BinaryPred, MetricCurve, AUC] {
       override def convertToTfmaProto(
-        underlying: AUC): Aggregator[BinaryPred, MetricCurve, EvalResult] =
+        underlying: AUC
+      ): Aggregator[BinaryPred, MetricCurve, EvalResult] =
         underlying
           .andThenPresent { areaValue =>
             val metricName = underlying.metric match {
@@ -269,8 +283,9 @@ trait TfmaImplicits {
   implicit val logLossConverter
     : TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
     new TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] {
-      override def convertToTfmaProto(underlying: LogLoss.type)
-        : Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
+      override def convertToTfmaProto(
+        underlying: LogLoss.type
+      ): Aggregator[Prediction[Int, List[Double]], (Double, Long), EvalResult] =
         underlying.andThenPresent { logLoss =>
           val metrics = buildDoubleMetric("Noether_LogLoss", logLoss)
           EvalResult(metrics)
@@ -280,8 +295,9 @@ trait TfmaImplicits {
   implicit def meanAvgPrecisionConverter[T]
     : TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
     new TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] {
-      override def convertToTfmaProto(underlying: MeanAveragePrecision[T])
-        : Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
+      override def convertToTfmaProto(
+        underlying: MeanAveragePrecision[T]
+      ): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
         underlying.andThenPresent { meanAvgPrecision =>
           val metrics = buildDoubleMetric("Noether_MeanAvgPrecision", meanAvgPrecision)
           EvalResult(metrics)
@@ -292,7 +308,8 @@ trait TfmaImplicits {
     : TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
     new TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]] {
       override def convertToTfmaProto(
-        underlying: NdcgAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
+        underlying: NdcgAtK[T]
+      ): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
         underlying.andThenPresent { ndcgAtK =>
           val metrics = buildDoubleMetric("Noether_NdcgAtK", ndcgAtK)
           EvalResult(metrics)
@@ -303,21 +320,26 @@ trait TfmaImplicits {
     : TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
     new TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] {
       override def convertToTfmaProto(
-        underlying: PrecisionAtK[T]): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
+        underlying: PrecisionAtK[T]
+      ): Aggregator[RankingPrediction[T], (Double, Long), EvalResult] =
         underlying.andThenPresent { precisionAtK =>
           val metrics = buildDoubleMetric("Noether_PrecisionAtK", precisionAtK)
           EvalResult(metrics)
         }
     }
 
-  implicit def calibrationHistogram: TfmaConverter[Prediction[Double, Double],
-                                                   Map[Double, (Double, Double, Long)],
-                                                   CalibrationHistogram] =
-    new TfmaConverter[Prediction[Double, Double],
-                      Map[Double, (Double, Double, Long)],
-                      CalibrationHistogram] {
-      override def convertToTfmaProto(underlying: CalibrationHistogram)
-        : Aggregator[Prediction[Double, Double], Map[Double, (Double, Double, Long)], EvalResult] =
+  implicit def calibrationHistogram: TfmaConverter[Prediction[Double, Double], Map[
+    Double,
+    (Double, Double, Long)
+  ], CalibrationHistogram] =
+    new TfmaConverter[
+      Prediction[Double, Double],
+      Map[Double, (Double, Double, Long)],
+      CalibrationHistogram
+    ] {
+      override def convertToTfmaProto(
+        underlying: CalibrationHistogram
+      ): Aggregator[Prediction[Double, Double], Map[Double, (Double, Double, Long)], EvalResult] =
         underlying.andThenPresent { calibrationHistogram =>
           val plot = buildCalibrationHistogramPlot(calibrationHistogram)
           EvalResult(Plot.CalibrationHistogram(plot))

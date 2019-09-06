@@ -47,13 +47,16 @@ final case class CalibrationHistogramBucket(
  * @param upperBound Right boundary, exclusive
  * @param numBuckets Number of buckets in the histogram
  */
+// scalastyle:off no.whitespace.after.left.bracket
 final case class CalibrationHistogram(
   lowerBound: Double = 0.0,
   upperBound: Double = 1.0,
   numBuckets: Int = 10
-) extends Aggregator[Prediction[Double, Double], Map[Double, (Double, Double, Long)], List[
-      CalibrationHistogramBucket
-    ]] {
+) extends Aggregator[
+      Prediction[Double, Double],
+      Map[Double, (Double, Double, Long)],
+      List[CalibrationHistogramBucket]
+    ] {
 
   val bucketSize = (upperBound - lowerBound) / numBuckets.toDouble
 
@@ -93,3 +96,4 @@ final case class CalibrationHistogram(
     }.toList
   }
 }
+// scalastyle:on no.whitespace.after.left.bracket

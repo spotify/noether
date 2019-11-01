@@ -57,7 +57,6 @@ final case class CalibrationHistogram(
       Map[Double, (Double, Double, Long)],
       List[CalibrationHistogramBucket]
     ] {
-
   val bucketSize = (upperBound - lowerBound) / numBuckets.toDouble
 
   private def thresholdsFromBucket(b: Double): (Double, Double) = b match {

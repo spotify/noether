@@ -29,7 +29,6 @@ import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 // scalastyle:off no.whitespace.after.left.bracket
 trait TfmaImplicits {
-
   private def confusionMatrixToMetric(cm: ConfusionMatrixAtThresholds): MetricsForSlice = {
     MetricsForSlice
       .newBuilder()
@@ -118,7 +117,6 @@ trait TfmaImplicits {
       .build()
 
   private def buildCalibrationHistogramPlot(ch: List[CalibrationHistogramBucket]): PlotsForSlice = {
-
     val plotData = PlotData
       .newBuilder()
       .setCalibrationHistogramBuckets(

@@ -28,7 +28,6 @@ import com.twitter.algebird.{Aggregator, Semigroup}
  */
 final case class ConfusionMatrix(labels: Seq[Int])
     extends Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], DenseMatrix[Long]] {
-
   def prepare(input: Prediction[Int, Int]): Map[(Int, Int), Long] =
     Map((input.predicted, input.actual) -> 1L)
 

@@ -46,7 +46,6 @@ final case class Report(
  */
 final case class ClassificationReport(threshold: Double = 0.5, beta: Double = 1.0)
     extends Aggregator[Prediction[Boolean, Double], Map[(Int, Int), Long], Report] {
-
   private val aggregator = MultiClassificationReport(Seq(0, 1))
 
   def prepare(input: Prediction[Boolean, Double]): Map[(Int, Int), Long] = {
@@ -72,7 +71,6 @@ final case class ClassificationReport(threshold: Double = 0.5, beta: Double = 1.
  */
 final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
     extends Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], Map[Int, Report]] {
-
   private val aggregator = ConfusionMatrix(labels)
 
   override def prepare(input: Prediction[Int, Int]): Map[(Int, Int), Long] =

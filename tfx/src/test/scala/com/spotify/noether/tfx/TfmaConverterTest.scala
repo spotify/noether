@@ -25,7 +25,6 @@ import tensorflow_model_analysis.MetricsForSliceOuterClass.CalibrationHistogramB
 import scala.collection.JavaConverters._
 
 class TfmaConverterTest extends FlatSpec with Matchers {
-
   implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
 
   "TfmaConverter" should "work with ConfusionMatrix" in {
@@ -93,7 +92,6 @@ class TfmaConverterTest extends FlatSpec with Matchers {
     assert(plotCm.getFalsePositives.toLong === 1L)
     assert(plotCm.getTrueNegatives.toLong === 2L)
     assert(plotCm.getTruePositives.toLong === 3L)
-
   }
 
   it should "work with ClassificationReport" in {

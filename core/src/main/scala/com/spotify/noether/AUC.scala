@@ -78,7 +78,6 @@ case object PR extends AUCMetric
  */
 case class Curve(metric: AUCMetric, samples: Int = 100)
     extends Aggregator[Prediction[Boolean, Double], MetricCurve, MetricCurvePoints] {
-
   private lazy val thresholds = linspace(0.0, 1.0, samples)
   private lazy val aggregators =
     thresholds.data.map(ClassificationReport(_)).toArray

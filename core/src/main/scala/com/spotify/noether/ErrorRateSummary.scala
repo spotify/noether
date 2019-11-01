@@ -24,7 +24,6 @@ import com.twitter.algebird.{Aggregator, Semigroup}
  */
 case object ErrorRateSummary
     extends Aggregator[Prediction[Int, List[Double]], (Double, Long), Double] {
-
   def prepare(input: Prediction[Int, List[Double]]): (Double, Long) = {
     val best = input.predicted.zipWithIndex.maxBy(_._1)._2
     if (best == input.actual) (0.0, 1L) else (1.0, 1L)

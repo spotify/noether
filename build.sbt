@@ -23,7 +23,7 @@ import com.typesafe.sbt.SbtGit.GitKeys._
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.6"
 val scalaTestVersion = "3.0.8"
-val protobufVersion = "3.10.0"
+val protobufVersion = "3.11.0"
 
 val commonSettings = Def.settings(
   organization := "com.spotify",

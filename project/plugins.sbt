@@ -12,5 +12,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.4.0")
 addSbtPlugin("com.github.gseitz" % "sbt-protobuf" % "0.6.5")
 
 libraryDependencies ++= Seq(
-  "com.github.os72" % "protoc-jar" % "3.8.0"
+  "com.github.os72" % "protoc-jar" % "3.10.1"
 )

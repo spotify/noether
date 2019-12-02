@@ -19,12 +19,14 @@ package com.spotify.noether.tfx
 
 import com.spotify.noether._
 import org.scalactic.{Equality, TolerantNumerics}
-import org.scalatest.{Assertion, FlatSpec, Matchers}
+import org.scalatest.Assertion
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 import tensorflow_model_analysis.MetricsForSliceOuterClass.CalibrationHistogramBuckets
 import scala.collection.JavaConverters._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class TfmaConverterTest extends FlatSpec with Matchers {
+class TfmaConverterTest extends AnyFlatSpec with Matchers {
   implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
 
   "TfmaConverter" should "work with ConfusionMatrix" in {

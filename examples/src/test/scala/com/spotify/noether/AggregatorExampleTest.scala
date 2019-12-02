@@ -17,9 +17,10 @@
 
 package com.spotify.noether
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class AggregatorExampleTest extends FlatSpec with Matchers {
+class AggregatorExampleTest extends AnyFlatSpec with Matchers {
   it should "not fail when executing example" in {
     AggregatorExample.main(Array.empty)
   }

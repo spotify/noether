@@ -21,8 +21,10 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, 
 
 import com.twitter.algebird.Aggregator
 import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-trait AggregatorTest extends FlatSpec with Matchers {
+trait AggregatorTest extends AnyFlatSpec with Matchers {
   def run[A, B, C](aggregator: Aggregator[A, B, C])(as: Seq[A]): C = {
     val bs = as.map(aggregator.prepare _ compose ensureSerializable)
     val b = ensureSerializable(aggregator.reduce(bs))

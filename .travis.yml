@@ -4,15 +4,15 @@ sudo: false
 matrix:
   fast_finish: true
   include:
-    - scala: 2.12.8
+    - scala: 2.12.10
       jdk: openjdk8
       script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck scalastyle test:scalastyle
 
-    - scala: 2.12.8
+    - scala: 2.12.10
       jdk: openjdk8
       script: sbt mimaReportBinaryIssues
 
-    - scala: 2.12.8
+    - scala: 2.12.10
       jdk: openjdk8
       script: sbt coverage "++$TRAVIS_SCALA_VERSION test" coverageReport coverageAggregate
       after_success:

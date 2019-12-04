@@ -2,30 +2,31 @@ language: scala
 sudo: false
 
 matrix:
-  fast_finish: true
   include:
-    - scala: 2.12.8
+    - scala: 2.12.10
       jdk: openjdk8
       script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck scalastyle test:scalastyle
 
-    - scala: 2.12.8
+    - scala: 2.12.10
       jdk: openjdk8
-      script: sbt mimaReportBinaryIssues
-
-    - scala: 2.12.8
-      jdk: openjdk8
-      script: sbt coverage "++$TRAVIS_SCALA_VERSION test" coverageReport coverageAggregate
+      script:
+        - >
+          sbt
+          coverage
+          "++$TRAVIS_SCALA_VERSION test"
+          coverageReport
+          coverageAggregate
+          "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
     - scala: 2.11.12
       jdk: openjdk8
-      script: sbt "++$TRAVIS_SCALA_VERSION test"
-
-  allow_failures:
-    - scala: 2.12.8
-      jdk: openjdk8
-      script: sbt mimaReportBinaryIssues
+      script:
+        - >
+          sbt
+          "++$TRAVIS_SCALA_VERSION test"
+          "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
 
 cache:
   directories:

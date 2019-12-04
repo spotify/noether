@@ -78,7 +78,8 @@ val commonSettings = Def.settings(
       email = "andrewsmartin.mg@gmail.com",
       url = url("https://twitter.com/andrew_martin92")
     )
-  )
+  ),
+  mimaFailOnNoPrevious := false
 )
 
 lazy val root: Project = project
@@ -217,7 +218,7 @@ lazy val commonScalacOptions = Seq(
 )
 
 // based on the nice https://github.com/typelevel/cats/blob/master/build.sbt#L208
-def mimaSettings(moduleName: String): Seq[Def.Setting[Set[sbt.ModuleID]]] = {
+def mimaSettings(moduleName: String): Seq[Def.Setting[_]] = {
   import sbtrelease.Version
   // Safety Net for Exclusions
   lazy val excludedVersions: Set[String] = Set()
@@ -262,6 +263,7 @@ def mimaSettings(moduleName: String): Seq[Def.Setting[Set[sbt.ModuleID]]] = {
     }
 
   Seq(
+    mimaFailOnNoPrevious := false,
     mimaPreviousArtifacts := (mimaVersions(version.value) ++ extraVersions)
       .diff(excludedVersions)
       .map(v => "com.spotify" %% moduleName % v)

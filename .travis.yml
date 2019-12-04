@@ -3,11 +3,11 @@ sudo: false
 
 matrix:
   include:
-    - scala: 2.12.10
+    - scala: 2.13.1
       jdk: openjdk8
       script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck scalastyle test:scalastyle
 
-    - scala: 2.12.10
+    - scala: 2.13.1
       jdk: openjdk8
       script:
         - >
@@ -19,6 +19,14 @@ matrix:
           "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
+
+    - scala: 2.12.10
+      jdk: openjdk8
+      script:
+        - >
+          sbt
+          "++$TRAVIS_SCALA_VERSION test"
+          "++$TRAVIS_SCALA_VERSION mimaReportBinaryIssues"
 
     - scala: 2.11.12
       jdk: openjdk8

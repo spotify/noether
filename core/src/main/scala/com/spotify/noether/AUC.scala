@@ -34,13 +34,10 @@ private[noether] object AreaUnderCurve {
   }
 
   def of(curve: MetricCurvePoints): Double = {
-    curve.points.toIterator
+    curve.points.iterator
       .sliding(2)
       .withPartial(false)
-      .aggregate(0.0)(
-        seqop = (auc: Double, points: Seq[MetricCurvePoint]) => auc + trapezoid(points),
-        combop = _ + _
-      )
+      .foldLeft(0.0)((auc: Double, points: Seq[MetricCurvePoint]) => auc + trapezoid(points))
   }
 }
 

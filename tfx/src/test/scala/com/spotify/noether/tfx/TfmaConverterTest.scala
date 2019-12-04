@@ -22,7 +22,7 @@ import org.scalactic.{Equality, TolerantNumerics}
 import org.scalatest.Assertion
 import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 import tensorflow_model_analysis.MetricsForSliceOuterClass.CalibrationHistogramBuckets
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

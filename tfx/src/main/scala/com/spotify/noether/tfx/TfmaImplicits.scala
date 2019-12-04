@@ -81,16 +81,17 @@ trait TfmaImplicits {
       .build()
 
   private def buildDoubleMetrics(metrics: Map[String, Double]): MetricsForSlice = {
-    val metricValues = metrics.mapValues { m =>
-      MetricValue
-        .newBuilder()
-        .setDoubleValue(
-          DoubleValue
+    val metricValues = metrics.iterator
+      .map {
+        case (k, m) =>
+          val value = MetricValue
             .newBuilder()
-            .setValue(m)
-        )
-        .build()
-    }.asJava
+            .setDoubleValue(DoubleValue.newBuilder().setValue(m))
+            .build()
+          (k, value)
+      }
+      .toMap
+      .asJava
 
     MetricsForSlice
       .newBuilder()

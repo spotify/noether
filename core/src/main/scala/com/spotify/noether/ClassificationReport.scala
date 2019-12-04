@@ -16,6 +16,7 @@
  */
 
 package com.spotify.noether
+
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
@@ -83,10 +84,26 @@ final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
   override def present(m: Map[(Int, Int), Long]): Map[Int, Report] = {
     val mat = m.withDefaultValue(0L)
     labels.foldLeft(Map.empty[Int, Report]) { (result, clazz) =>
-      val fp = mat.filterKeys { case (p, a) => p == clazz && a != clazz }.values.sum.toDouble
+      val fp = mat.iterator
+        .filter {
+          case ((p, a), _) => p == clazz && a != clazz
+        }
+        .map(_._2)
+        .sum
+        .toDouble
       val tp = mat(clazz -> clazz).toDouble
-      val tn = mat.filterKeys { case (p, a) => p != clazz && a != clazz }.values.sum.toDouble
-      val fn = mat.filterKeys { case (p, a) => p != clazz && a == clazz }.values.sum.toDouble
+      val tn = mat.iterator
+        .filter {
+          case ((p, a), _) => p != clazz && a != clazz
+        }
+        .map(_._2)
+        .sum
+        .toDouble
+      val fn = mat.iterator
+        .filter { case ((p, a), _) => p != clazz && a == clazz }
+        .map(_._2)
+        .sum
+        .toDouble
 
       val mccDenom = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
       val mcc = if (mccDenom > 0.0) ((tp * tn) - (fp * fn)) / mccDenom else 0.0

@@ -143,13 +143,13 @@ trait TfmaImplicits {
       .build()
   }
 
-  implicit def confusionMatrixConversion(agg: ConfusionMatrix)(
-    implicit c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix]
+  implicit def confusionMatrixConversion(agg: ConfusionMatrix)(implicit
+    c: TfmaConverter[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix]
   ): ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix] =
     ConversionOps[Prediction[Int, Int], Map[(Int, Int), Long], ConfusionMatrix](agg, c)
 
-  implicit def calibrationHistogramConversion(agg: CalibrationHistogram)(
-    implicit c: TfmaConverter[
+  implicit def calibrationHistogramConversion(agg: CalibrationHistogram)(implicit
+    c: TfmaConverter[
       Prediction[Double, Double],
       Map[Double, (Double, Double, Long)],
       CalibrationHistogram
@@ -168,43 +168,43 @@ trait TfmaImplicits {
       c
     )
 
-  implicit def binaryConfusionMatrixConversion(agg: BinaryConfusionMatrix)(
-    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix]
+  implicit def binaryConfusionMatrixConversion(agg: BinaryConfusionMatrix)(implicit
+    c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix]
   ): ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix] =
     ConversionOps[BinaryPred, Map[(Int, Int), Long], BinaryConfusionMatrix](agg, c)
 
-  implicit def classificationReportConversion(agg: ClassificationReport)(
-    implicit c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport]
+  implicit def classificationReportConversion(agg: ClassificationReport)(implicit
+    c: TfmaConverter[BinaryPred, Map[(Int, Int), Long], ClassificationReport]
   ): ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport] =
     ConversionOps[BinaryPred, Map[(Int, Int), Long], ClassificationReport](agg, c)
 
-  implicit def aucConversion(agg: AUC)(
-    implicit c: TfmaConverter[BinaryPred, MetricCurve, AUC]
+  implicit def aucConversion(agg: AUC)(implicit
+    c: TfmaConverter[BinaryPred, MetricCurve, AUC]
   ): ConversionOps[BinaryPred, MetricCurve, AUC] =
     ConversionOps[BinaryPred, MetricCurve, AUC](agg, c)
 
-  implicit def errorRateSummaryConversion(agg: ErrorRateSummary.type)(
-    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type]
+  implicit def errorRateSummaryConversion(agg: ErrorRateSummary.type)(implicit
+    c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type]
   ): ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type] =
     ConversionOps[Prediction[Int, List[Double]], (Double, Long), ErrorRateSummary.type](agg, c)
 
-  implicit def logLossConversion(agg: LogLoss.type)(
-    implicit c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type]
+  implicit def logLossConversion(agg: LogLoss.type)(implicit
+    c: TfmaConverter[Prediction[Int, List[Double]], (Double, Long), LogLoss.type]
   ): ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type] =
     ConversionOps[Prediction[Int, List[Double]], (Double, Long), LogLoss.type](agg, c)
 
-  implicit def meanAvgPrecisionConversion[T](agg: MeanAveragePrecision[T])(
-    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]]
+  implicit def meanAvgPrecisionConversion[T](agg: MeanAveragePrecision[T])(implicit
+    c: TfmaConverter[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]]
   ): ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), MeanAveragePrecision[T]](agg, c)
 
-  implicit def ndcgAtKConversion[T](agg: NdcgAtK[T])(
-    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]]
+  implicit def ndcgAtKConversion[T](agg: NdcgAtK[T])(implicit
+    c: TfmaConverter[RankingPrediction[T], (Double, Long), NdcgAtK[T]]
   ): ConversionOps[RankingPrediction[T], (Double, Long), NdcgAtK[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), NdcgAtK[T]](agg, c)
 
-  implicit def precisionAtKConversion[T](agg: PrecisionAtK[T])(
-    implicit c: TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]]
+  implicit def precisionAtKConversion[T](agg: PrecisionAtK[T])(implicit
+    c: TfmaConverter[RankingPrediction[T], (Double, Long), PrecisionAtK[T]]
   ): ConversionOps[RankingPrediction[T], (Double, Long), PrecisionAtK[T]] =
     ConversionOps[RankingPrediction[T], (Double, Long), PrecisionAtK[T]](agg, c)
 

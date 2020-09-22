@@ -26,7 +26,7 @@ import scala.collection.mutable.ArrayBuffer
  * retrieve the aggregated value from the Map emitted by the "present" function.
  */
 class MultiAggregatorMap[A, B, C](aggregatorsMap: List[(String, Aggregator[A, B, C])])
-  extends Aggregator[A, List[B], Map[String, C]] {
+    extends Aggregator[A, List[B], Map[String, C]] {
 
   private val aggregators = aggregatorsMap.map(_._2)
 
@@ -50,9 +50,7 @@ class MultiAggregatorMap[A, B, C](aggregatorsMap: List[(String, Aggregator[A, B,
     val resultList = new ArrayBuffer[(String, C)]
     val aggregatorsMapKeys = aggregatorsMap.map(_._1)
     while (i < aggregators.length) {
-      val aggregator = aggregators(i)
-      val aggregatorKey = aggregatorsMapKeys(i)
-      resultList.append(aggregatorKey -> aggregator.present(reduction(i)))
+      resultList.append(aggregatorsMapKeys(i) -> aggregators(i).present(reduction(i)))
       i += 1
     }
     resultList.toMap

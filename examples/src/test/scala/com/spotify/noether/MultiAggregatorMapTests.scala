@@ -21,7 +21,7 @@ import com.twitter.algebird._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers._
 
-class MultiListAggregatorTests extends AnyFlatSpec {
+class MultiAggregatorMapTests extends AnyFlatSpec {
 
   it must "aggregate into a list of individual aggregator results" in {
 

@@ -25,7 +25,7 @@ class MultiListAggregatorTests extends AnyFlatSpec {
 
   it must "aggregate into a list of individual aggregator results" in {
 
-    val multiListAgg = MultiListAggregator.apply[Long, Long, Long](
+    val multiListAgg = new MultiAggregatorMap[Long, Long, Long](
       List(
         "min" -> Aggregator.min,
         "max" -> Aggregator.max,

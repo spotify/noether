@@ -28,7 +28,7 @@ import scala.collection.mutable.ArrayBuffer
 case class MultiAggregatorMap[-A, B, +C](aggregatorsMap: List[(String, Aggregator[A, B, C])])
     extends Aggregator[A, List[B], Map[String, C]] {
 
-  private val aggregators = aggregatorsMap.map(_._2)
+  private[this] val aggregators = aggregatorsMap.map(_._2)
 
   def prepare(input: A): List[B] =
     aggregators.map(_.prepare(input))

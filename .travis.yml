@@ -5,7 +5,7 @@ matrix:
   include:
     - scala: 2.13.1
       jdk: openjdk8
-      script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck scalastyle test:scalastyle
+      script: sbt scalafmtSbtCheck scalafmtCheckAll
 
     - scala: 2.13.1
       jdk: openjdk8

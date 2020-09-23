@@ -21,7 +21,7 @@ import org.scalactic.{Equality, TolerantNumerics}
 
 class NdcgAtKTest extends AggregatorTest {
   import RankingData._
-  private implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
+  implicit private val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "compute ndcg for rankings" in {
     assert(run(NdcgAtK[Int](3))(rankingData) === 1.0 / 3)

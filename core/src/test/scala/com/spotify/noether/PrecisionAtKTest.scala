@@ -21,7 +21,7 @@ import org.scalactic.{Equality, TolerantNumerics}
 
 class PrecisionAtKTest extends AggregatorTest {
   import RankingData._
-  private implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
+  implicit private val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "compute precisionAtK for rankings" in {
     assert(run(PrecisionAtK[Int](1))(rankingData) === 1.0 / 3)

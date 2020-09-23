@@ -20,7 +20,7 @@ package com.spotify.noether
 import org.scalactic.{Equality, TolerantNumerics}
 
 class LogLossTest extends AggregatorTest {
-  private implicit val doubleEq: Equality[Double] =
+  implicit private val doubleEq: Equality[Double] =
     TolerantNumerics.tolerantDoubleEquality(0.1)
   private val classes = 10
   private def s(idx: Int, score: Double): List[Double] =

@@ -21,7 +21,7 @@ import org.scalactic.TolerantNumerics
 import org.scalactic.Equality
 
 class ClassificationReportTest extends AggregatorTest {
-  private implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
+  implicit private val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   it should "return correct scores" in {
     val data = List(

@@ -27,7 +27,7 @@ import tensorflow_model_analysis.MetricsForSliceOuterClass._
 
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
-// scalastyle:off no.whitespace.after.left.bracket
+
 trait TfmaImplicits {
   private def confusionMatrixToMetric(cm: ConfusionMatrixAtThresholds): MetricsForSlice = {
     MetricsForSlice
@@ -352,4 +352,3 @@ trait TfmaImplicits {
         }
     }
 }
-// scalastyle:on no.whitespace.after.left.bracket

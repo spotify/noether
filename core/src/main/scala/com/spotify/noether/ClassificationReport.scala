@@ -80,7 +80,6 @@ final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
   override def semigroup: Semigroup[Map[(Int, Int), Long]] =
     aggregator.semigroup
 
-  //scalastyle:off cyclomatic.complexity
   override def present(m: Map[(Int, Int), Long]): Map[Int, Report] = {
     val mat = m.withDefaultValue(0L)
     labels.foldLeft(Map.empty[Int, Report]) { (result, clazz) =>
@@ -132,5 +131,5 @@ final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
       result + (clazz -> Report(mcc, fscore, precision, recall, accuracy, fpr))
     }
   }
-  //scalastyle:on cyclomatic.complexity
+
 }

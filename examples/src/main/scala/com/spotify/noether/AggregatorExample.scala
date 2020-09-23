@@ -29,8 +29,7 @@ object AggregatorExample {
 
     val predictions = List(Prediction(false, 0.1), Prediction(false, 0.6), Prediction(true, 0.9))
 
-    // scalastyle:off regex
     println(multiAggregator.apply(predictions))
-    // scalastyle:on regex
+
   }
 }

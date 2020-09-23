@@ -47,7 +47,7 @@ final case class CalibrationHistogramBucket(
  * @param upperBound Right boundary, exclusive
  * @param numBuckets Number of buckets in the histogram
  */
-// scalastyle:off no.whitespace.after.left.bracket
+
 final case class CalibrationHistogram(
   lowerBound: Double = 0.0,
   upperBound: Double = 1.0,
@@ -95,4 +95,3 @@ final case class CalibrationHistogram(
     }.toList
   }
 }
-// scalastyle:on no.whitespace.after.left.bracket

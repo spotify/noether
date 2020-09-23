@@ -85,16 +85,16 @@ final case class MultiClassificationReport(labels: Seq[Int], beta: Double = 1.0)
     val mat = m.withDefaultValue(0L)
     labels.foldLeft(Map.empty[Int, Report]) { (result, clazz) =>
       val fp = mat.iterator
-        .filter {
-          case ((p, a), _) => p == clazz && a != clazz
+        .filter { case ((p, a), _) =>
+          p == clazz && a != clazz
         }
         .map(_._2)
         .sum
         .toDouble
       val tp = mat(clazz -> clazz).toDouble
       val tn = mat.iterator
-        .filter {
-          case ((p, a), _) => p != clazz && a != clazz
+        .filter { case ((p, a), _) =>
+          p != clazz && a != clazz
         }
         .map(_._2)
         .sum

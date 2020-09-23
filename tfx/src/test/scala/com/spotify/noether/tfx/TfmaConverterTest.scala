@@ -163,8 +163,8 @@ class TfmaConverterTest extends AnyFlatSpec with Matchers {
     def s(idx: Int, score: Double): List[Double] =
       0.until(classes).map(i => if (i == idx) score else 0.0).toList
 
-    val data = List((s(0, 0.8), 0), (s(1, 0.6), 1), (s(2, 0.7), 2)).map {
-      case (scores, label) => Prediction(label, scores)
+    val data = List((s(0, 0.8), 0), (s(1, 0.6), 1), (s(2, 0.7), 2)).map { case (scores, label) =>
+      Prediction(label, scores)
     }
 
     val logLossProto: MetricsForSlice = LogLoss.asTfmaProto(data).metrics.get

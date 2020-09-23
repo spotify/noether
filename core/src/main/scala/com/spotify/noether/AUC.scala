@@ -84,9 +84,8 @@ case class Curve(metric: AUCMetric, samples: Int = 100)
 
   def semigroup: Semigroup[MetricCurve] = {
     val sg = ClassificationReport().semigroup
-    Semigroup.from {
-      case (l, r) =>
-        MetricCurve(l.cm.zip(r.cm).map { case (cl, cr) => sg.plus(cl, cr) })
+    Semigroup.from { case (l, r) =>
+      MetricCurve(l.cm.zip(r.cm).map { case (cl, cr) => sg.plus(cl, cr) })
     }
   }
 

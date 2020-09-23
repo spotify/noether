@@ -18,7 +18,6 @@
 package com.spotify.noether
 
 import breeze.linalg.DenseMatrix
-import org.scalactic.TolerantNumerics
 
 class ConfusionMatrixTest extends AggregatorTest {
   it should "return correct confusion matrix" in {

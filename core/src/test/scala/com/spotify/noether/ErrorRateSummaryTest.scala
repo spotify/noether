@@ -18,9 +18,10 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
+import org.scalactic.Equality
 
 class ErrorRateSummaryTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
+  private implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
   private val classes = 10
   private def s(idx: Int): List[Double] =
     0.until(classes).map(i => if (i == idx) 1.0 else 0.0).toList

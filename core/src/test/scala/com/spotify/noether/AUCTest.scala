@@ -18,9 +18,10 @@
 package com.spotify.noether
 
 import org.scalactic.TolerantNumerics
+import org.scalactic.Equality
 
 class AUCTest extends AggregatorTest {
-  private implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.1)
+  private implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.1)
 
   private val data =
     List(

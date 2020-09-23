@@ -27,7 +27,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class TfmaConverterTest extends AnyFlatSpec with Matchers {
-  implicit val doubleEq = TolerantNumerics.tolerantDoubleEquality(0.001)
+  implicit val doubleEq: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.001)
 
   "TfmaConverter" should "work with ConfusionMatrix" in {
     val data = List(

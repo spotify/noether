@@ -18,7 +18,6 @@
 package com.spotify.noether.tfx
 
 import com.twitter.algebird.Aggregator
-import tensorflow_model_analysis.MetricsForSliceOuterClass.MetricsForSlice
 
 object Tfma {
   trait ConversionOps[A, B, T <: Aggregator[A, B, _]] {

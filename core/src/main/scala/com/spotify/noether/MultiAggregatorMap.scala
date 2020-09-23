@@ -25,7 +25,7 @@ import scala.collection.mutable.ArrayBuffer
  * Each aggregator in the list is tagged by a string. The string(aka name) could be used to
  * retrieve the aggregated value from the Map emitted by the "present" function.
  */
-class MultiAggregatorMap[-A, B, +C](aggregatorsMap: List[(String, Aggregator[A, B, C])])
+case class MultiAggregatorMap[-A, B, +C](aggregatorsMap: List[(String, Aggregator[A, B, C])])
     extends Aggregator[A, List[B], Map[String, C]] {
 
   private val aggregators = aggregatorsMap.map(_._2)

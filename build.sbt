@@ -32,12 +32,20 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.3",
-  crossScalaVersions := Seq("2.11.12", "2.12.12", scalaVersion.value),
+  crossScalaVersions := Seq("0.27.0-RC1", "2.11.12", "2.12.12", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
-    if (!scalaVersion.value.startsWith("2.13")) olderScalacOptions else Seq.empty
+    VersionNumber(scalaVersion.value) match {
+      case v if v.matchesSemVer(SemanticSelector("2.11.x || 2.12.x")) =>
+        scalac2Options ++ olderScalacOptions
+      case v if v.matchesSemVer(SemanticSelector("2.13.x")) =>
+        scalac2Options
+      case _ =>
+        Nil
+    }
   },
   scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
+  scalacOptions ++= { if (isDotty.value) Seq("-source:3.0-migration") else Nil },
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc) := Seq("-source", "1.8"),
   sonatypeProfileName := "com.spotify",
@@ -111,10 +119,12 @@ lazy val noetherCore: Project = project
     moduleName := "noether-core",
     description := "Machine Learning Aggregators",
     libraryDependencies ++= Seq(
-      "org.scalanlp" %% "breeze" % breezeVersion,
-      "com.twitter" %% "algebird-core" % algebirdVersion,
       "org.scalatest" %% "scalatest" % scalaTestVersion
     ),
+    libraryDependencies ++= Seq(
+      "org.scalanlp" %% "breeze" % breezeVersion,
+      "com.twitter" %% "algebird-core" % algebirdVersion
+    ).map(_.withDottyCompat(scalaVersion.value)),
     fork in Test := true
   )
 
@@ -154,9 +164,13 @@ lazy val noetherTFX: Project = project
     moduleName := "noether-tfx",
     description := "TFX adapters",
     libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % scalaTestVersion
+    ),
+    libraryDependencies ++= Seq(
       "org.scalanlp" %% "breeze" % breezeVersion,
-      "com.twitter" %% "algebird-core" % algebirdVersion,
-      "org.scalatest" %% "scalatest" % scalaTestVersion,
+      "com.twitter" %% "algebird-core" % algebirdVersion
+    ).map(_.withDottyCompat(scalaVersion.value)),
+    libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java" % protobufVersion % ProtobufConfig.name
     ),
     version in ProtobufConfig := protobufVersion,
@@ -181,6 +195,10 @@ lazy val commonScalacOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-encoding",
   "utf-8", // Specify character encoding used by source files.
+  "-language:implicitConversions"
+)
+
+lazy val scalac2Options = Seq(
   "-explaintypes", // Explain type errors in more detail.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-unchecked", // Enable additional warnings where generated code depends on assumptions.

@@ -40,15 +40,6 @@ val commonSettings = Def.settings(
   scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc) := Seq("-source", "1.8"),
-  publishTo := Some(if (isSnapshot.value) {
-    Opts.resolver.sonatypeSnapshots
-  } else {
-    Opts.resolver.sonatypeStaging
-  }),
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
   sonatypeProfileName := "com.spotify",
   licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
   homepage := Some(url("https://github.com/spotify/noether")),
@@ -228,7 +219,21 @@ val olderScalacOptions = Seq(
 
 // based on the nice https://github.com/typelevel/cats/blob/master/build.sbt#L208
 def mimaSettings(moduleName: String): Seq[Def.Setting[_]] = {
-  import sbtrelease.Version
+  case class Version(major: Int, subversions: Seq[Int], qualifier: Option[String])
+  object Version {
+    import scala.util.Try
+    val VersionR = """([0-9]+)((?:\.[0-9]+)+)?([\.\-0-9a-zA-Z]*)?""".r
+
+    def apply(s: String): Option[Version] = Try {
+      val VersionR(maj, subs, qual) = s
+      // parse the subversions (if any) to a Seq[Int]
+      val subSeq: Seq[Int] = Option(subs) map { str =>
+        // split on . and remove empty strings
+        str.split('.').filterNot(_.trim.isEmpty).map(_.toInt).toSeq
+      } getOrElse Nil
+      Version(maj.toInt, subSeq, Option(qual).filterNot(_.isEmpty))
+    }.toOption
+  }
   // Safety Net for Exclusions
   lazy val excludedVersions: Set[String] = Set()
   // Safety Net for Inclusions

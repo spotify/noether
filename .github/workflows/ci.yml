@@ -35,8 +35,10 @@ jobs:
           - 8
           - 11
         scala:
+          - 2.11.12
           - 2.12.12
           - 2.13.3
+          - 0.27.0-RC1
   mimaReport:
     runs-on: ubuntu-latest
     steps:
@@ -54,5 +56,6 @@ jobs:
           - 8
           - 11
         scala:
+          - 2.11.12
           - 2.12.12
           - 2.13.3

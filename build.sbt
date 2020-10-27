@@ -45,7 +45,9 @@ val commonSettings = Def.settings(
     }
   },
   scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
-  scalacOptions ++= { if (isDotty.value) Seq("-source:3.0-migration") else Nil },
+  scalacOptions ++= {
+    if (isDotty.value) Seq("-source:3.0-migration", "-siteroot", "./docs") else Nil
+  },
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc) := Seq("-source", "1.8"),
   sonatypeProfileName := "com.spotify",
@@ -125,7 +127,7 @@ lazy val noetherCore: Project = project
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion
     ).map(_.withDottyCompat(scalaVersion.value)),
-    fork in Test := true
+    Test / fork := true
   )
 
 lazy val noetherBenchmark = project
@@ -146,7 +148,8 @@ lazy val noetherExamples: Project = project
     name := "noether-examples",
     moduleName := "noether-examples",
     description := "Noether Examples",
-    publish / skip := true
+    publish / skip := true,
+    Compile / doc / sources := Nil
   )
   .dependsOn(noetherCore)
 

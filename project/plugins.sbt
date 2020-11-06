@@ -10,7 +10,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.4.1")
 addSbtPlugin("com.github.gseitz" % "sbt-protobuf" % "0.6.5")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.23")
 addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.5.4")
-addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.4")
+addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.5")
 
 libraryDependencies ++= Seq(
   "com.github.os72" % "protoc-jar" % "3.11.4"

@@ -22,7 +22,7 @@ import com.typesafe.sbt.SbtGit.GitKeys._
 
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.7"
-val scalaTestVersion = "3.2.2"
+val scalaTestVersion = "3.2.3"
 val protobufVersion = "3.14.0"
 
 ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
@@ -32,7 +32,7 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.3",
-  crossScalaVersions := Seq("0.27.0-RC1", "2.11.12", "2.12.12", scalaVersion.value),
+  crossScalaVersions := Seq("3.0.0-M2", "2.11.12", "2.12.12", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
     VersionNumber(scalaVersion.value) match {
@@ -46,7 +46,7 @@ val commonSettings = Def.settings(
   },
   scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
   scalacOptions ++= {
-    if (isDotty.value) Seq("-source:3.0-migration", "-siteroot", "./docs") else Nil
+    if (isDotty.value) Seq("-source:3.0-migration") else Nil
   },
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   javacOptions in (Compile, doc) := Seq("-source", "1.8"),

@@ -29,7 +29,7 @@ object AggregatorExample {
 
     val predictions = List(Prediction(false, 0.1), Prediction(false, 0.6), Prediction(true, 0.9))
 
-    println(multiAggregator.apply(predictions))
-
+    multiAggregator.apply(predictions)
+    ()
   }
 }

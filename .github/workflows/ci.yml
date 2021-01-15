@@ -37,7 +37,7 @@ jobs:
         scala:
           - 2.11.12
           - 2.12.13
-          - 2.13.3
+          - 2.13.4
           - 3.0.0-M3
   mimaReport:
     runs-on: ubuntu-latest
@@ -58,4 +58,4 @@ jobs:
         scala:
           - 2.11.12
           - 2.12.13
-          - 2.13.3
+          - 2.13.4

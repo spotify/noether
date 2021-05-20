@@ -6,7 +6,7 @@ addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.9.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.4.1")
 addSbtPlugin("com.github.sbt" % "sbt-protobuf" % "0.7.0")
-addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.27")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.28")
 addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.5.7")
 addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.5")
 

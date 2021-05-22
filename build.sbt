@@ -21,7 +21,7 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtGit.GitKeys._
 
 val breezeVersion = "1.0"
-val algebirdVersion = "0.13.7"
+val algebirdVersion = "0.13.8"
 val scalaTestVersion = "3.2.3"
 val protobufVersion = "3.17.0"
 

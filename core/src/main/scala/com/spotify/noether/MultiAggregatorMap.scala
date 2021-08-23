@@ -21,9 +21,9 @@ import com.twitter.algebird.{Aggregator, Semigroup}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Aggregator which combines an unbounded list of other aggregators.
- * Each aggregator in the list is tagged by a string. The string(aka name) could be used to
- * retrieve the aggregated value from the Map emitted by the "present" function.
+ * Aggregator which combines an unbounded list of other aggregators. Each aggregator in the list is
+ * tagged by a string. The string(aka name) could be used to retrieve the aggregated value from the
+ * Map emitted by the "present" function.
  */
 case class MultiAggregatorMap[-A, B, +C](aggregatorsMap: List[(String, Aggregator[A, B, C])])
     extends Aggregator[A, List[B], Map[String, C]] {

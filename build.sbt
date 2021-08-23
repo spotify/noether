@@ -292,7 +292,7 @@ def mimaSettings(moduleName: String): Seq[Def.Setting[_]] = {
     Version(version) match {
       case Some(Version(major, Seq(minor, patch), _)) =>
         semverBinCompatVersions(major.toInt, minor.toInt, patch.toInt)
-          .map { case (maj, min, pat) => s"${maj}.${min}.${pat}" }
+          .map { case (maj, min, pat) => s"$maj.$min.$pat" }
       case _ =>
         Set.empty[String]
     }

@@ -20,18 +20,18 @@ package com.spotify.noether
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
- * Compute the average NDCG value of all the predictions, truncated at ranking position k.
- * The discounted cumulative gain at position k is computed as:
- *    sum,,i=1,,^k^ (2^{relevance of ''i''th item}^ - 1) / log(i + 1),
- * and the NDCG is obtained by dividing the DCG value on the ground truth set. In the current
- * implementation, the relevance value is binary.
- * If a query has an empty ground truth set, zero will be used as ndcg
+ * Compute the average NDCG value of all the predictions, truncated at ranking position k. The
+ * discounted cumulative gain at position k is computed as: sum,,i=1,,^k^ (2^{relevance of ''i''th
+ * item}^ - 1) / log(i + 1), and the NDCG is obtained by dividing the DCG value on the ground truth
+ * set. In the current implementation, the relevance value is binary. If a query has an empty ground
+ * truth set, zero will be used as ndcg
  *
  * See the following paper for detail:
  *
  * IR evaluation methods for retrieving highly relevant documents. K. Jarvelin and J. Kekalainen
  *
- * @param k the position to compute the truncated ndcg, must be positive
+ * @param k
+ *   the position to compute the truncated ndcg, must be positive
  */
 case class NdcgAtK[T](k: Int) extends Aggregator[RankingPrediction[T], (Double, Long), Double] {
   require(k > 0, "ranking position k should be positive")

@@ -20,8 +20,8 @@ package com.spotify.noether
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
- * Returns the mean average precision (MAP) of all the predictions.
- * If a query has an empty ground truth set, the average precision will be zero
+ * Returns the mean average precision (MAP) of all the predictions. If a query has an empty ground
+ * truth set, the average precision will be zero
  */
 case class MeanAveragePrecision[T]()
     extends Aggregator[RankingPrediction[T], (Double, Long), Double] {

@@ -21,10 +21,11 @@ import breeze.linalg.DenseMatrix
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
- * Special Case for a Binary Confusion Matrix to make it easier to compose with other
- * binary aggregators
+ * Special Case for a Binary Confusion Matrix to make it easier to compose with other binary
+ * aggregators
  *
- * @param threshold Threshold to apply on predictions
+ * @param threshold
+ *   Threshold to apply on predictions
  */
 case class BinaryConfusionMatrix(threshold: Double = 0.5)
     extends Aggregator[Prediction[Boolean, Double], Map[(Int, Int), Long], DenseMatrix[Long]] {

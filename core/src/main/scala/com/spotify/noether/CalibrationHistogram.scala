@@ -23,11 +23,16 @@ import scala.math.floor
 /**
  * Histogram bucket.
  *
- * @param lowerThresholdInclusive Lower bound on bucket, inclusive
- * @param upperThresholdExclusive Upper bound on bucket, exclusive
- * @param numPredictions Number of predictions in this bucket
- * @param sumLabels Sum of label values for this bucket
- * @param sumPredictions Sum of prediction values for this bucket
+ * @param lowerThresholdInclusive
+ *   Lower bound on bucket, inclusive
+ * @param upperThresholdExclusive
+ *   Upper bound on bucket, exclusive
+ * @param numPredictions
+ *   Number of predictions in this bucket
+ * @param sumLabels
+ *   Sum of label values for this bucket
+ * @param sumPredictions
+ *   Sum of prediction values for this bucket
  */
 final case class CalibrationHistogramBucket(
   lowerThresholdInclusive: Double,
@@ -40,12 +45,15 @@ final case class CalibrationHistogramBucket(
 /**
  * Split predictions into Tensorflow Model Analysis compatible CalibrationHistogramBucket buckets.
  *
- * If a prediction is less than the lower bound, it belongs to the bucket [-inf, lower bound)
- * If it is greater than or equal to the upper bound, it belongs to the bucket (upper bound, inf]
+ * If a prediction is less than the lower bound, it belongs to the bucket [-inf, lower bound) If it
+ * is greater than or equal to the upper bound, it belongs to the bucket (upper bound, inf]
  *
- * @param lowerBound Left boundary, inclusive
- * @param upperBound Right boundary, exclusive
- * @param numBuckets Number of buckets in the histogram
+ * @param lowerBound
+ *   Left boundary, inclusive
+ * @param upperBound
+ *   Right boundary, exclusive
+ * @param numBuckets
+ *   Number of buckets in the histogram
  */
 
 final case class CalibrationHistogram(

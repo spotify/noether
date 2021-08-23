@@ -21,10 +21,11 @@ import breeze.linalg.DenseMatrix
 import com.twitter.algebird.{Aggregator, Semigroup}
 
 /**
- * Generic Consfusion Matrix Aggregator for any dimension.
- * Thresholds must be applied to make a prediction prior to using this aggregator.
+ * Generic Consfusion Matrix Aggregator for any dimension. Thresholds must be applied to make a
+ * prediction prior to using this aggregator.
  *
- * @param labels List of possible label values
+ * @param labels
+ *   List of possible label values
  */
 final case class ConfusionMatrix(labels: Seq[Int])
     extends Aggregator[Prediction[Int, Int], Map[(Int, Int), Long], DenseMatrix[Long]] {

@@ -23,7 +23,7 @@ import com.typesafe.sbt.SbtGit.GitKeys._
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.8"
 val scalaTestVersion = "3.2.3"
-val protobufVersion = "3.17.3"
+val protobufVersion = "3.18.0"
 
 ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
 
@@ -32,7 +32,7 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.6",
-  crossScalaVersions := Seq("3.0.0-M3", "2.11.12", "2.12.14", scalaVersion.value),
+  crossScalaVersions := Seq("3.0.0-M3", "2.11.12", "2.12.15", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
     VersionNumber(scalaVersion.value) match {

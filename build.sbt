@@ -25,6 +25,7 @@ val algebirdVersion = "0.13.9"
 val scalaTestVersion = "3.2.3"
 val protobufVersion = "3.21.5"
 
+
 ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
 
 val commonSettings = Def.settings(
@@ -32,7 +33,7 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.8",
-  crossScalaVersions := Seq("3.0.0-M3", "2.11.12", "2.12.15", scalaVersion.value),
+  crossScalaVersions := Seq("3.0.0-M3", "2.11.12", "2.12.17", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
     VersionNumber(scalaVersion.value) match {

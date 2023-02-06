@@ -23,7 +23,8 @@ import com.typesafe.sbt.SbtGit.GitKeys._
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.9"
 val scalaTestVersion = "3.2.3"
-val protobufVersion = "3.20.2"
+val protobufVersion = "3.21.5"
+
 
 ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
 

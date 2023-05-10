@@ -44,12 +44,12 @@ val commonSettings = Def.settings(
         Nil
     }
   },
-  scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
+  Compile / console / scalacOptions --= Seq("-Xfatal-warnings"),
   scalacOptions ++= {
     if (isDotty.value) Seq("-source:3.0-migration") else Nil
   },
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
-  javacOptions in (Compile, doc) := Seq("-source", "1.8"),
+  Compile / doc / javacOptions := Seq("-source", "1.8"),
   sonatypeProfileName := "com.spotify",
   licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
   homepage := Some(url("https://github.com/spotify/noether")),
@@ -155,8 +155,8 @@ lazy val noetherExamples: Project = project
 
 lazy val docSettings = Def.settings(
   autoAPIMappings := true,
-  siteSubdirName in ScalaUnidoc := "latest/api",
-  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc)
+  ScalaUnidoc / siteSubdirName := "latest/api",
+  addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, ScalaUnidoc / siteSubdirName)
 )
 
 lazy val noetherTFX: Project = project
@@ -176,17 +176,17 @@ lazy val noetherTFX: Project = project
     libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java" % protobufVersion % ProtobufConfig.name
     ),
-    version in ProtobufConfig := protobufVersion,
-    protobufRunProtoc in ProtobufConfig := (args =>
+    ProtobufConfig / version := protobufVersion,
+    ProtobufConfig / protobufRunProtoc := (args =>
       com.github.os72.protocjar.Protoc.runProtoc("-v3.8.0" +: args.toArray)
     ),
     // Protobuf files are compiled to src_managed/main/compiled_protobuf
     // Exclude their parent to avoid confusing IntelliJ
-    sourceDirectories in Compile := (sourceDirectories in Compile).value
+    Compile / sourceDirectories := (Compile / sourceDirectories).value
       .filterNot(_.getPath.endsWith("/src_managed/main")),
-    managedSourceDirectories in Compile := (managedSourceDirectories in Compile).value
+    Compile / managedSourceDirectories := (Compile / managedSourceDirectories).value
       .filterNot(_.getPath.endsWith("/src_managed/main")),
-    sources in doc in Compile := List(), // suppress warnings
+    Compile / doc / sources := List(), // suppress warnings
     compileOrder := CompileOrder.JavaThenScala
   )
   .enablePlugins(ProtobufPlugin)

@@ -18,7 +18,7 @@
 import pl.project13.scala.sbt.JmhPlugin
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbt.SbtGit.GitKeys._
+import com.github.sbt.git.SbtGit.GitKeys.gitRemoteRepo
 
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.9"

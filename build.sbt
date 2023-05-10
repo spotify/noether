@@ -18,12 +18,12 @@
 import pl.project13.scala.sbt.JmhPlugin
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbt.SbtGit.GitKeys._
+import com.github.sbt.git.SbtGit.GitKeys.gitRemoteRepo
 
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.9"
-val scalaTestVersion = "3.2.3"
-val protobufVersion = "3.22.4"
+val scalaTestVersion = "3.2.15"
+val protobufVersion = "3.23.0"
 
 ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
 
@@ -32,7 +32,7 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.10",
-  crossScalaVersions := Seq("3.0.0-M3", "2.11.12", "2.12.17", scalaVersion.value),
+  crossScalaVersions := Seq("3.2.2", "2.11.12", "2.12.17", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
     VersionNumber(scalaVersion.value) match {
@@ -44,12 +44,12 @@ val commonSettings = Def.settings(
         Nil
     }
   },
-  scalacOptions in (Compile, console) --= Seq("-Xfatal-warnings"),
-  scalacOptions ++= {
-    if (isDotty.value) Seq("-source:3.0-migration") else Nil
-  },
+  Compile / console / scalacOptions --= Seq("-Xfatal-warnings"),
+  // scalacOptions ++= {
+  //   if (isDotty.value) Seq("-source:3.0-migration") else Nil
+  // },
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
-  javacOptions in (Compile, doc) := Seq("-source", "1.8"),
+  Compile / doc / javacOptions := Seq("-source", "1.8"),
   sonatypeProfileName := "com.spotify",
   licenses := Seq("Apache 2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
   homepage := Some(url("https://github.com/spotify/noether")),
@@ -85,7 +85,8 @@ val commonSettings = Def.settings(
       url = url("https://twitter.com/andrew_martin92")
     )
   ),
-  mimaFailOnNoPrevious := false
+  mimaFailOnNoPrevious := false,
+  Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 )
 
 lazy val root: Project = project
@@ -126,7 +127,7 @@ lazy val noetherCore: Project = project
     libraryDependencies ++= Seq(
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion
-    ).map(_.withDottyCompat(scalaVersion.value)),
+    ).map(_.cross(CrossVersion.for3Use2_13)),
     Test / fork := true
   )
 
@@ -155,8 +156,8 @@ lazy val noetherExamples: Project = project
 
 lazy val docSettings = Def.settings(
   autoAPIMappings := true,
-  siteSubdirName in ScalaUnidoc := "latest/api",
-  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc)
+  ScalaUnidoc / siteSubdirName := "latest/api",
+  addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, ScalaUnidoc / siteSubdirName)
 )
 
 lazy val noetherTFX: Project = project
@@ -172,24 +173,16 @@ lazy val noetherTFX: Project = project
     libraryDependencies ++= Seq(
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion
-    ).map(_.withDottyCompat(scalaVersion.value)),
+    ).map(_.cross(CrossVersion.for3Use2_13)),
     libraryDependencies ++= Seq(
-      "com.google.protobuf" % "protobuf-java" % protobufVersion % ProtobufConfig.name
+      "com.google.protobuf" % "protobuf-java" % protobufVersion % "protobuf"
     ),
-    version in ProtobufConfig := protobufVersion,
-    protobufRunProtoc in ProtobufConfig := (args =>
-      com.github.os72.protocjar.Protoc.runProtoc("-v3.8.0" +: args.toArray)
+    Compile / PB.targets := Seq(
+      PB.gens.java -> (Compile / sourceManaged).value
     ),
-    // Protobuf files are compiled to src_managed/main/compiled_protobuf
-    // Exclude their parent to avoid confusing IntelliJ
-    sourceDirectories in Compile := (sourceDirectories in Compile).value
-      .filterNot(_.getPath.endsWith("/src_managed/main")),
-    managedSourceDirectories in Compile := (managedSourceDirectories in Compile).value
-      .filterNot(_.getPath.endsWith("/src_managed/main")),
-    sources in doc in Compile := List(), // suppress warnings
+    Compile / doc / sources := List(), // suppress warnings
     compileOrder := CompileOrder.JavaThenScala
   )
-  .enablePlugins(ProtobufPlugin)
   .dependsOn(noetherCore % "test->test;compile->compile")
 
 // sampled from https://tpolecat.github.io/2017/04/25/scalac-flags.html

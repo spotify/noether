@@ -22,8 +22,8 @@ import com.github.sbt.git.SbtGit.GitKeys.gitRemoteRepo
 
 val breezeVersion = "1.0"
 val algebirdVersion = "0.13.9"
-val scalaTestVersion = "3.2.3"
-val protobufVersion = "3.22.4"
+val scalaTestVersion = "3.2.15"
+val protobufVersion = "3.23.0"
 
 ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
 
@@ -174,22 +174,14 @@ lazy val noetherTFX: Project = project
       "com.twitter" %% "algebird-core" % algebirdVersion
     ).map(_.withDottyCompat(scalaVersion.value)),
     libraryDependencies ++= Seq(
-      "com.google.protobuf" % "protobuf-java" % protobufVersion % ProtobufConfig.name
+      "com.google.protobuf" % "protobuf-java" % protobufVersion % "protobuf"
     ),
-    ProtobufConfig / version := protobufVersion,
-    ProtobufConfig / protobufRunProtoc := (args =>
-      com.github.os72.protocjar.Protoc.runProtoc("-v3.8.0" +: args.toArray)
+    Compile / PB.targets := Seq(
+      PB.gens.java -> (Compile / sourceManaged).value
     ),
-    // Protobuf files are compiled to src_managed/main/compiled_protobuf
-    // Exclude their parent to avoid confusing IntelliJ
-    Compile / sourceDirectories := (Compile / sourceDirectories).value
-      .filterNot(_.getPath.endsWith("/src_managed/main")),
-    Compile / managedSourceDirectories := (Compile / managedSourceDirectories).value
-      .filterNot(_.getPath.endsWith("/src_managed/main")),
     Compile / doc / sources := List(), // suppress warnings
     compileOrder := CompileOrder.JavaThenScala
   )
-  .enablePlugins(ProtobufPlugin)
   .dependsOn(noetherCore % "test->test;compile->compile")
 
 // sampled from https://tpolecat.github.io/2017/04/25/scalac-flags.html

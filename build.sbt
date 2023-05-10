@@ -32,7 +32,7 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.10",
-  crossScalaVersions := Seq("3.0.0-M3", "2.11.12", "2.12.17", scalaVersion.value),
+  crossScalaVersions := Seq("3.2.2", "2.11.12", "2.12.17", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
     VersionNumber(scalaVersion.value) match {
@@ -45,9 +45,9 @@ val commonSettings = Def.settings(
     }
   },
   Compile / console / scalacOptions --= Seq("-Xfatal-warnings"),
-  scalacOptions ++= {
-    if (isDotty.value) Seq("-source:3.0-migration") else Nil
-  },
+  // scalacOptions ++= {
+  //   if (isDotty.value) Seq("-source:3.0-migration") else Nil
+  // },
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint:unchecked"),
   Compile / doc / javacOptions := Seq("-source", "1.8"),
   sonatypeProfileName := "com.spotify",
@@ -85,7 +85,8 @@ val commonSettings = Def.settings(
       url = url("https://twitter.com/andrew_martin92")
     )
   ),
-  mimaFailOnNoPrevious := false
+  mimaFailOnNoPrevious := false,
+  Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
 )
 
 lazy val root: Project = project
@@ -126,7 +127,7 @@ lazy val noetherCore: Project = project
     libraryDependencies ++= Seq(
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion
-    ).map(_.withDottyCompat(scalaVersion.value)),
+    ).map(_.cross(CrossVersion.for3Use2_13)),
     Test / fork := true
   )
 
@@ -172,7 +173,7 @@ lazy val noetherTFX: Project = project
     libraryDependencies ++= Seq(
       "org.scalanlp" %% "breeze" % breezeVersion,
       "com.twitter" %% "algebird-core" % algebirdVersion
-    ).map(_.withDottyCompat(scalaVersion.value)),
+    ).map(_.cross(CrossVersion.for3Use2_13)),
     libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java" % protobufVersion % "protobuf"
     ),

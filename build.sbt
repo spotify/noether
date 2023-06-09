@@ -32,7 +32,7 @@ val commonSettings = Def.settings(
   name := "noether",
   description := "ML Aggregators",
   scalaVersion := "2.13.10",
-  crossScalaVersions := Seq("3.2.2", "2.11.12", "2.12.17", scalaVersion.value),
+  crossScalaVersions := Seq("3.2.2", "2.11.12", "2.12.18", scalaVersion.value),
   scalacOptions ++= commonScalacOptions,
   scalacOptions ++= {
     VersionNumber(scalaVersion.value) match {

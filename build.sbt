@@ -21,7 +21,7 @@ import sbt.Keys._
 import com.github.sbt.git.SbtGit.GitKeys.gitRemoteRepo
 
 val breezeVersion = "1.0"
-val algebirdVersion = "0.13.9"
+val algebirdVersion = "0.13.10"
 val scalaTestVersion = "3.2.15"
 val protobufVersion = "3.23.0"
 
